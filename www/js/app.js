@@ -2,11 +2,17 @@
 // This uses require.js to structure javascript:
 // http://requirejs.org/docs/api.html#define
 
+function formatDate(d) {
+    return (d.getMonth()+1) + '/' +
+        d.getDate() + '/' +
+        d.getFullYear();
+}
+
+
 define(function(require) {
     // Zepto (http://zeptojs.com/) and Backbone (http://backbonejs.org/)
     var $ = require('zepto');
     var Backbone = require('backbone');
-    alert('hi');
 
     // Receipt verification (https://github.com/mozilla/receiptverifier)
     require('receiptverifier');
@@ -103,9 +109,9 @@ define(function(require) {
             this.el.innerHTML = m.get('title') + ' - ' +
                 '<em>' + formatDate(m.get('date')) + '</em>';
 
-            if(detailView.model == this.model) {
-                detailView.render();
-            }
+            // if(detailView.model == this.model) {
+            //     detailView.render();
+            // }
 
             return this;
         },
