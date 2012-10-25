@@ -7,7 +7,7 @@
 
 (function(root, factory) {
   // Set up Backbone appropriately for the environment.
-  if (typeof exports !== 'undefined') {
+  if (typeof exports !== 'undefined' && typeof process !== 'undefined') {
     // Node/CommonJS, no need for jQuery in that case.
     factory(root, exports, require('underscore'));
   } else if (typeof define === 'function' && define.amd) {

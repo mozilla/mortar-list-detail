@@ -1,0 +1,24 @@
+
+
+(function() {
+
+window.count = 100;
+
+function initUI() {
+}
+
+window.onresize = function() {
+    initUI();
+};
+
+initUI();
+})();
+
+window.count = 100;
+app.items.add(new app.Item({ id: count++,
+                             title: 'AND THINGS',
+                             desc: 'Move this over there',
+                             date: new Date(12, 10, 1) }));
+
+(function() {
+})();

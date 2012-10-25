@@ -10,18 +10,38 @@
     <!-- Place favicon.ico in the root directory -->
 
     <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/install-button.css">
+    <link rel="stylesheet" href="css/layouts.css">
   </head>
   <body>
     <!-- Use this installation button to install locally without going
          through the marketpace (see app.js) -->
-    <button id="install-btn">Install</button>    
+    <!-- <button id="install-btn">Install</button>     -->
 
     <div id="app">
-      <header>
-        <h1></h1>
+      <header class="navbar">
+        <button>New</button>
+
+        <h1>Items</h1>
+
+        <button>New</button>
+        <button>Edit</button>
       </header>
 
-      <section class="list">
+      <section class="list open">
+      </section>
+
+      <section class="detail">
+        <button class="back">Back</button>
+        <button class="edit">Edit</button>
+        <div class="content"></div>
+      </section>
+
+      <section class="edit">
+        <input type="hidden" name="id" value="" />
+        <div class="field">Title: <input type="text" name="title" /></div>
+        <div class="field">Description: <input type="text" name="desc" /></div>
+        <button type="submit" class="add">Add</button>
       </section>
     </div>
 
