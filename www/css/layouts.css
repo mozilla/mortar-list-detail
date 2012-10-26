@@ -19,13 +19,20 @@ html, body {
     cursor: pointer;
 }
 
+#app > section {
+    display: none;
+
+    transition: height ease-out 0.3s;
+	-o-transition: height ease-out 0.3s;
+	-ms-transition: height ease-out 0.3s;
+	-moz-transition: height ease-out 0.3s;
+	-webkit-transition: height ease-out 0.3s;
+}
+
 #app > section.open {
     display: block;
 }
 
-#app > section {
-    display: none;
-}
 
 #app {
     width: 100%;
@@ -53,26 +60,37 @@ header {
     color: white;
 
     display: none;
+    height: 2em;
+    padding: .5em 0;
 }
 
-header > div {
+.navbar .navitems {
     position: absolute;
     top: 0;
     right: 0;
     z-index: 100;
+
+    margin: .5em 0;
+    height: 2em;
 }
 
-header > div.left {
+.navbar .navitems.left {
     top: 0;
     left: 0;
-    width: auto;
     text-align: left;
 }
 
-header button {
-    -moz-box-flex: 0;
-    margin: 1em 0;
+.navbar .navitems button {
+    height: 100%;
+    margin-right: .5em;
+    margin-left: 0;
     font-size: .75em;
+    border: 0;
+}
+
+.navbar .navitems.left button {
+    margin-left: .5em;
+    margin-right: 0;
 }
 
 #app > section {
@@ -80,7 +98,7 @@ header button {
 }
 
 header h1 {
-    margin: .25em;
+    margin: 0;
     position: relative;
     top: .03em;
     padding: 0;

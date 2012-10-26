@@ -7,3 +7,10 @@
 
 /* Your styles here */
 
+section.detail, section.edit {
+    margin: 1em;
+}
+
+section.edit .field {
+    margin-top: 1em;
+}
