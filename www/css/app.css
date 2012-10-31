@@ -7,8 +7,8 @@
 
 /* Your styles here */
 
-section.detail, section.edit {
-    margin: 1em;
+section.detail .contents, section.edit .contents {
+    padding: 1em
 }
 
 section.edit .field {

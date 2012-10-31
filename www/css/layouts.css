@@ -20,26 +20,27 @@ html, body {
 }
 
 #app > section {
+    background-color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
     display: none;
-
-    transition: height ease-out 0.3s;
-	-o-transition: height ease-out 0.3s;
-	-ms-transition: height ease-out 0.3s;
-	-moz-transition: height ease-out 0.3s;
-	-webkit-transition: height ease-out 0.3s;
 }
 
-#app > section.open {
-    display: block;
+#app > section.moving {
+    transition: left ease-in 0.1s;
+	-o-transition: left ease-in 0.1s;
+	-ms-transition: left ease-in 0.1s;
+	-moz-transition: left ease-in 0.1s;
+	-webkit-transition: left ease-in 0.1s;
 }
-
 
 #app {
     width: 100%;
     height: 100%;
 }
 
-header {
+section > header {
     overflow: hidden;
     text-align: center;
     width: 100%;
@@ -59,28 +60,22 @@ header {
 	-moz-box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.7);
     color: white;
 
-    display: none;
     height: 2em;
     padding: .5em 0;
 }
 
-.navbar .navitems {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 100;
-
-    margin: .5em 0;
+section > header .navitems {
     height: 2em;
+    float: right;
 }
 
-.navbar .navitems.left {
+section > header .navitems.left {
     top: 0;
     left: 0;
-    text-align: left;
+    float: left;
 }
 
-.navbar .navitems button {
+section > header .navitems button {
     height: 100%;
     margin-right: .5em;
     margin-left: 0;
@@ -88,19 +83,22 @@ header {
     border: 0;
 }
 
-.navbar .navitems.left button {
+section > header .navitems.left button {
     margin-left: .5em;
     margin-right: 0;
 }
 
-#app > section {
+#app > section .contents {
     overflow: auto;
 }
 
 header h1 {
+    position: absolute;
+    top: 0;
+    left: 0;
     margin: 0;
-    position: relative;
-    top: .03em;
+    margin-top: 4pt;
     padding: 0;
-    line-height: 1;
+    font-size: 2em;
+    line-height: 31pt;
 }

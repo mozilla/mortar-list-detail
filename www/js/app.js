@@ -40,17 +40,17 @@ define(function(require) {
             this._stack = [];
         }
 
-        if(this.opts.onPush) {
-            this.opts.onPush.call(this, view);
-        }
-
         this._stack.push(view);
-        
+
         var methods = view.stack;
 
         if(methods && methods.open) {
             var args = Array.prototype.slice.call(arguments, 1);
             view[methods.open].apply(view, args);
+        }
+
+        if(this.opts.onPush) {
+            this.opts.onPush.call(this, view);
         }
     };
 
@@ -59,35 +59,71 @@ define(function(require) {
             var view = this._stack.pop();
             var methods = view.stack;
 
+            if(this.opts.onPop) {
+                this.opts.onPop.call(this, view);
+            }
+
             if(methods && methods.close) {
                 var args = Array.prototype.slice.call(arguments, 1);
                 view[methods.close].apply(view, args);
             }
-
-            if(this.opts.onPop) {
-                this.opts.onPop.call(this, view);
-            }
         }
     };
 
-    var stack = new ViewStack({ 
-        onPush: function(view) {
-            this._stack.forEach(function(view) {
-                $(view.el).removeClass('open');
-            });
 
-            $(view.el).addClass('open');
+    var stack = new ViewStack({
+        onPush: function(view) {
+            var section = $(view.el);
+
+            if(this._stack.length > 1) {
+                section.css({
+                    left: section.width()
+                });
+
+                setTimeout(function() {
+                    section.addClass('moving');
+                    section.css({
+                        left: 0
+                    });
+                }, 0);
+            }
+
+            section.css({ zIndex: 100 + this._stack.length });
+
+            if(view.getTitle) {
+                $('header h1', section).text(view.getTitle.call(view));
+            }
+
+            if(this._stack.length > 1) {
+                var nav = $('.navitems.left', section);
+                if(!nav.children().length) {
+                    nav.append('<button class="back">Back</button>');
+                    nav.children('button.back').on('click', function() {
+                        stack.pop();
+                    });
+                }
+            }
+
+            if(this._stack.length <= 1) {
+                $('.navitems.left button.back', section).remove();
+            }
+
+            centerTitle(section);
         },
 
         onPop: function(view) {
-            $(view.el).removeClass('open');
+            var section = $(view.el);
+            section.css({
+                left: section.width()
+            });
 
-            var last = this._stack[this._stack.length-1];
-            $(last.el).addClass('open');
+            //var last = this._stack[this._stack.length-1];
         }
     });
 
     var EditView = Backbone.View.extend({
+        title: 'Edit',
+
         events: {
             'click button.add': 'save'
         },
@@ -97,13 +133,19 @@ define(function(require) {
         },
 
         open: function(id) {
-            if(id) {
+            var el = $(this.el);
+
+            if(id !== undefined && id !== null) {
                 var model = items.get(id);
-                var el = $(this.el);
 
                 el.find('input[name=id]').val(model.id);
                 el.find('input[name=title]').val(model.get('title'));
                 el.find('input[name=desc]').val(model.get('desc'));
+            }
+            else {
+                el.find('input[name=id]').val('');
+                el.find('input[name=title]').val('');
+                el.find('input[name=desc]').val('');
             }
         },
 
@@ -139,7 +181,6 @@ define(function(require) {
 
     var DetailView = Backbone.View.extend({
         events: {
-            'click button.back': 'back',
             'click button.edit': 'edit'
         },
 
@@ -147,17 +188,17 @@ define(function(require) {
             'open': 'open'
         },
 
+        getTitle: function() {
+            return 'Editing: ' + this.model.get('title');
+        },
+
         open: function(item) {
             this.model = item;
-            
+
             // Todo: don't bind this multiple times
             this.model.on('change', _.bind(this.render, this));
 
             this.render();
-        },
-
-        back: function() {
-            stack.pop();
         },
 
         edit: function() {
@@ -168,12 +209,10 @@ define(function(require) {
         render: function() {
             var m = this.model;
 
-            $('.content', this.el).html(
-                '<div class="contents">' +
+            $('.contents', this.el).html(
                 '<h1>' + m.get('title') + '</h1>' +
                 '<p>' + m.get('desc') + '</p>' +
-                '<p>' + formatDate(m.get('date')) + '</p>' +
-                '</div>'
+                '<p>' + formatDate(m.get('date')) + '</p>'
             );
         }
     });
@@ -181,12 +220,13 @@ define(function(require) {
     var ListView = Backbone.View.extend({
         initialize: function() {
             this.collection.bind('add', _.bind(this.appendItem, this));
+
+            $('.contents', this.el).append('<ul class="_list"></ul>');
             this.render();
         },
 
         render: function() {
-            var el = $(this.el);
-            el.html('<div class="contents"><ul></ul></div>');
+            $('._list', this.el).html('');
 
             _.each(this.collection.models, function(item) {
                 this.appendItem(item);
@@ -195,7 +235,7 @@ define(function(require) {
 
         appendItem: function(item) {
             var row = new ListViewRow({ model: item });
-            $('ul', this.el).append(row.render().el);
+            $('._list', this.el).append(row.render().el);
         }
     });
 
@@ -220,9 +260,6 @@ define(function(require) {
         },
 
         open: function() {
-            $(this.el).parent().find('li').removeClass('open');
-            $(this.el).addClass('open');
-            
             //window.location.hash = '#details/' + this.model.id;
             stack.push(detailView, items.get(this.model.id));
         }
@@ -230,12 +267,6 @@ define(function(require) {
 
     var items = new ItemList();
     addData(Item, items);
-
-    var editView = new EditView({ el: $('#app > section.edit') });
-    var detailView = new DetailView({ el: $('#app > section.detail') });
-    var listView = new ListView({ collection: items,
-                                  el: $('#app > section.list')});
-    stack.push(listView);
 
     $('header button.add').click(function() {
         stack.push(editView);
@@ -268,31 +299,105 @@ define(function(require) {
     window.app.Item = Item;
     window.app.items = items;
 
-    function initUI() {
-        var h1 = $('header > h1')[0];
-        var els = $('header > *');
-        var i = els.get().indexOf(h1);
-        var wrapper = '<div class="navitems"></div>';
+    function centerTitle(section) {
+        var header = section.children('header');
+        var leftSize = header.children('.navitems.left').width();
+        var rightSize = header.children('.navitems.right').width();
+        var margin = Math.max(leftSize, rightSize);
+        var width = section.width() - margin*2;
+        var title = header.children('h1');
 
-        els.slice(0, i).wrapAll($(wrapper).addClass('left'));
-        els.slice(i+1, els.length).wrapAll($(wrapper).addClass('right'));
-        $('header').show();
+        var text = title.text();
 
-        var height = $('#app').height();
-        var headerHeight = $('#app > header').height();
+        if(text.length > 22) {
+            text = text.slice(0, 22) + '...';
+        }
 
-        var s = $('section.open');
-        s.css({ height: height - headerHeight });
+        var fontSize;
+        if(text.length <= 5) {
+            fontSize = 22;
+        }
+        else if(text.length >= 25) {
+            fontSize = 12;
+        }
+        else {
+            var l = text.length - 5;
+            var i = 1 - l / 20;
 
-        
-        //var w = $('#app > section').wrapAll('<div class="views"></div>').width();
-        // var cur = 0;
-        // $('#app > section').each(function() {
-        //     $(this).
-        // });
+            fontSize = 12 + (22 - 12) * i;
+        }
+
+        title.text(text);
+        title.css({ left: margin,
+                    width: width,
+                    fontSize: fontSize + 'pt' });
     }
 
+    function initUI() {
+        $('section > header').each(function() {
+            var header = $(this);
+            var h1 = $('h1', header)[0];
+            var els = header.children();
+            var i = els.get().indexOf(h1);
+            var wrapper = '<div class="navitems"></div>';
+
+            els.slice(0, i).wrapAll($(wrapper).addClass('left'));
+            els.slice(i+1, els.length).wrapAll($(wrapper).addClass('right'));
+        });
+
+        var appHeight = $('#app').height();
+
+        $('#app > section').each(function() {
+            var el = $(this);
+            el.width($('body').width());
+
+            if(!el.children('header').length) {
+                var first = el.children().first();
+                var header = $('<header></header>');
+
+                if(first.is('h1')) {
+                    first.wrap(header);
+                }
+                else {
+                    el.prepend(header);
+                    header.append('<h1>section</h1>');
+                }
+            }
+
+            var header = $('header', el);
+            if(!header.children('.navitems.left').length) {
+                header.prepend('<div class="navitems left"></div>');
+            }
+
+            if(!header.children('.navitems.right').length) {
+                header.append('<div class="navitems right"></div>');
+            }
+
+            var header = el.children('header').remove();
+
+            var contents = el.children();
+            if(!contents.length) {
+                el.append('<div class="contents"></div>');
+            }
+            else {
+                contents.wrapAll('<div class="contents"></div>');
+            }
+            el.prepend(header);
+
+            var height = el.children('header').height();
+            el.children('.contents').css({ height: appHeight - height });
+        });
+    }
+
+    $('#app > section').show();
     initUI();
+
+    var editView = new EditView({ el: $('#app > section.edit') });
+    var detailView = new DetailView({ el: $('#app > section.detail') });
+    var listView = new ListView({ collection: items,
+                                  el: $('#app > section.list')});
+    stack.push(listView);
+    centerTitle($(listView.el));
 
     // window.onresize = function() {
     //     initUI();
