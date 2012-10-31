@@ -4,6 +4,7 @@ html, body {
     padding: 0;
     height: 100%;
     overflow: hidden;
+    font-family: Georgia, serif;
 }
 
 #app .list ul {
@@ -25,14 +26,15 @@ html, body {
     top: 0;
     left: 0;
     display: none;
+    border-left: 1px solid black;
 }
 
 #app > section.moving {
-    transition: left ease-in 0.1s;
-	-o-transition: left ease-in 0.1s;
-	-ms-transition: left ease-in 0.1s;
-	-moz-transition: left ease-in 0.1s;
-	-webkit-transition: left ease-in 0.1s;
+    transition: left ease-in 0.15s;
+	-o-transition: left ease-in 0.15s;
+	-ms-transition: left ease-in 0.15s;
+	-moz-transition: left ease-in 0.15s;
+	-webkit-transition: left ease-in 0.15s;
 }
 
 #app {
@@ -100,5 +102,5 @@ header h1 {
     margin-top: 4pt;
     padding: 0;
     font-size: 2em;
-    line-height: 31pt;
+    line-height: 29pt;
 }

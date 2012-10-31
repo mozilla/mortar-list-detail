@@ -11,6 +11,10 @@ section.detail .contents, section.edit .contents {
     padding: 1em
 }
 
+section.detail .contents h1 {
+    margin: 0;
+}
+
 section.edit .field {
     margin-top: 1em;
 }
