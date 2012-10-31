@@ -26,6 +26,12 @@ define(function(require) {
                                desc: 'Move this over there',
                                date: new Date(12, 10, 1) }));
 
+    function formatDate(d) {
+        return (d.getMonth()+1) + '/' +
+            d.getDate() + '/' +
+            d.getFullYear();
+    }
+
     function renderRow(view) {
         var model = view.model;
         view.el.innerHTML = model.get('title') + ' - ' +
@@ -34,12 +40,11 @@ define(function(require) {
 
     function renderDetail(view) {
         var model = view.model;
+        var contents = $('.contents', view.el);
 
-        $('.contents', view.el).html(
-            '<h1>' + model.get('title') + '</h1>' +
-                '<p>' + model.get('desc') + '</p>' +
-                '<p>' + formatDate(model.get('date')) + '</p>'
-        );
+        contents.children('.title').text(model.get('title'));
+        contents.children('.desc').text(model.get('desc'));
+        contents.children('.date').text(formatDate(model.get('date')));
     }
 
     function renderEdit(view) {

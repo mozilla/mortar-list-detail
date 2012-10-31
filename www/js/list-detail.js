@@ -1,10 +1,4 @@
 
-function formatDate(d) {
-    return (d.getMonth()+1) + '/' +
-        d.getDate() + '/' +
-        d.getFullYear();
-}
-
 define(function(require) {
     var $ = require('zepto');
     var _ = require('underscore');
@@ -82,9 +76,6 @@ define(function(require) {
                 var nav = $('.navitems.left', section);
                 if(!nav.children().length) {
                     nav.append('<button class="back">Back</button>');
-                    nav.children('button.back').on('click', function() {
-                        stack.pop();
-                    });
                 }
             }
 
@@ -118,8 +109,8 @@ define(function(require) {
 
         open: function(item) {
             this.model = item;
-            var el = $(this.el);
 
+            var el = $(this.el);
             if(item === undefined || item === null) {
                 el.find('input').val('');
             }
@@ -240,6 +231,10 @@ define(function(require) {
 
     $('header button.add').click(function() {
         stack.push(editView);
+    });
+
+    $('header button.back').live('click', function() {
+        stack.pop();
     });
 
     var Workspace = Backbone.Router.extend({
