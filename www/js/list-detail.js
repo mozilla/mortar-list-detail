@@ -142,10 +142,6 @@ define(function(require) {
                                      date: new Date() }));
             }
 
-            id.val('');
-            title.val('');
-            desc.val('');
-
             stack.pop();
         }
     });
@@ -168,15 +164,18 @@ define(function(require) {
 
             // Todo: don't bind this multiple times
             this.model.on('change', _.bind(this.render, this));
-
-            if(this.options.render) {
-                this.options.render(this);
-            }
+            this.render();
         },
 
         edit: function() {
             //window.location.hash = '#edit/' + this.model.id;
             stack.push(editView, this.model);
+        },
+
+        render: function() {
+            if(this.options.render) {
+                this.options.render(this);
+            }
         }
     });
 
