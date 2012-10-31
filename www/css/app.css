@@ -19,12 +19,12 @@ section.edit .field {
     margin-top: 1em;
 }
 
-/* section.list li:before { */
-/*     content: ' '; */
-/*     display: inline-block; */
-/*     width: 15px; */
-/*     height: 15px; */
-/*     background: url(/img/glyphicons-halflings.png) no-repeat -95px -2px; */
-/*     margin-right: 5px; */
-/*     vertical-align: middle; */
-/* } */
+section.list li:before {
+    content: ' ';
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background: url(/img/glyphicons-halflings.png) no-repeat -95px -2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
