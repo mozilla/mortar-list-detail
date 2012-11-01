@@ -97,14 +97,16 @@ define(function(require) {
     });
 
     var EditView = Backbone.View.extend({
-        title: 'Edit',
-
         events: {
             'click button.add': 'save'
         },
 
         stack: {
             'open': 'open'
+        },
+
+        getTitle: function() {
+            return 'Editing: ' + this.model.get('title');
         },
 
         open: function(item) {
@@ -156,7 +158,7 @@ define(function(require) {
         },
 
         getTitle: function() {
-            return 'Editing: ' + this.model.get('title');
+            return this.model.get('title');
         },
 
         open: function(item) {
