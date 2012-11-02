@@ -11,20 +11,22 @@ define(function(require) {
 
     // Write your app here.
 
+    $('.delete').click(function() {});
+
     var app = require('./list-detail');
 
-    app.addItem(new app.Item({ id: 0,
-                               title: 'Cook yummy food',
-                               desc: 'COOK ALL THE THINGS',
-                               date: new Date() }));
-    app.addItem(new app.Item({ id: 1,
-                               title: 'Make things',
-                               desc: 'Make this look like that',
-                               date: new Date(12, 9, 5) }));
-    app.addItem(new app.Item({ id: 2,
-                               title: 'Move stuff',
-                               desc: 'Move this over there',
-                               date: new Date(12, 10, 1) }));
+    app.addItem({ id: 0,
+                  title: 'Cook yummy food',
+                  desc: 'COOK ALL THE THINGS',
+                  date: new Date() });
+    app.addItem({ id: 1,
+                  title: 'Make things',
+                  desc: 'Make this look like that',
+                  date: new Date(12, 9, 5) });
+    app.addItem({ id: 2,
+                  title: 'Move stuff',
+                  desc: 'Move this over there',
+                  date: new Date(12, 10, 1) });
 
     function formatDate(d) {
         return (d.getMonth()+1) + '/' +
@@ -35,7 +37,7 @@ define(function(require) {
     function renderRow(view) {
         var model = view.model;
         view.el.innerHTML = model.get('title') + ' - ' +
-            '<em>' + formatDate(model.get('date')) + '</em>';
+            '<strong>' + formatDate(model.get('date')) + '</strong>';
     }
 
     function renderDetail(view) {

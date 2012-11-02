@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
 
+    // The default model and collection
     var Item = Backbone.Model.extend({});
     var ItemList = Backbone.Collection.extend({
         model: Item
@@ -133,15 +134,15 @@ define(function(require) {
             var desc = el.find('input[name=desc]');
 
             if(id.val()) {
-                var model = items.get(id.val());
+                var model = itemList.get(id.val());
                 model.set({ title: title.val(),
                             desc: desc.val() });
             }
             else {
-                items.add(new Item({ id: items.length,
-                                     title: title.val(),
-                                     desc: desc.val(),
-                                     date: new Date() }));
+                itemList.add(new itemList.model({ id: itemList.length,
+                                                  title: title.val(),
+                                                  desc: desc.val(),
+                                                  date: new Date() }));
             }
 
             stack.pop();
@@ -224,11 +225,9 @@ define(function(require) {
 
         open: function() {
             //window.location.hash = '#details/' + this.model.id;
-            stack.push(detailView, items.get(this.model.id));
+            stack.push(detailView, itemList.get(this.model.id));
         }
     });
-
-    var items = new ItemList();
 
     $('header button.add').click(function() {
         stack.push(editView);
@@ -261,9 +260,6 @@ define(function(require) {
 
     window.app = new Workspace();
     Backbone.history.start();
-
-    window.app.Item = Item;
-    window.app.items = items;
 
     function centerTitle(section) {
         var header = section.children('header');
@@ -358,6 +354,7 @@ define(function(require) {
     }
 
     var editView, detailView, listView;
+    var itemList = new ItemList();
 
     return {
         init: function(renderRow, renderDetail, renderEdit) {
@@ -369,7 +366,7 @@ define(function(require) {
             detailView = new DetailView({ el: $('#app > section.detail'),
                                           render: renderDetail });
             
-            listView = new ListView({ collection: items,
+            listView = new ListView({ collection: itemList,
                                       el: $('#app > section.list'),
                                       render: renderRow });
 
@@ -378,7 +375,11 @@ define(function(require) {
         },
 
         addItem: function(item) {
-            items.add(item);
+            itemList.add(item);
+        },
+
+        setItems: function(collection) {
+            itemList = collection;
         },
 
         Item: Item
