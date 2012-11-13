@@ -3,6 +3,10 @@ define(function(require) {
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
+    var Stack = require('layouts/stack');
+    var Header = require('layouts/header');
+
+    var APP_SELECTOR = '#app';
 
     // The default model and collection
     var Item = Backbone.Model.extend({});
@@ -10,92 +14,7 @@ define(function(require) {
         model: Item
     });
 
-    function ViewStack(opts) {
-        this.opts = opts;
-    }
-
-    ViewStack.prototype.push = function(view) {
-        if(!this._stack) {
-            this._stack = [];
-        }
-
-        this._stack.push(view);
-
-        var methods = view.stack;
-
-        if(methods && methods.open) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            view[methods.open].apply(view, args);
-        }
-
-        if(this.opts.onPush) {
-            this.opts.onPush.call(this, view);
-        }
-    };
-
-    ViewStack.prototype.pop = function() {
-        if(this._stack) {
-            var view = this._stack.pop();
-            var methods = view.stack;
-
-            if(this.opts.onPop) {
-                this.opts.onPop.call(this, view);
-            }
-
-            if(methods && methods.close) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                view[methods.close].apply(view, args);
-            }
-        }
-    };
-
-
-    var stack = new ViewStack({
-        onPush: function(view) {
-            var section = $(view.el);
-
-            if(this._stack.length > 1) {
-                section.css({
-                    left: section.width()
-                });
-
-                setTimeout(function() {
-                    section.addClass('moving');
-                    section.css({
-                        left: 0
-                    });
-                }, 0);
-            }
-
-            section.css({ zIndex: 100 + this._stack.length });
-
-            if(view.getTitle) {
-                $('header h1', section).text(view.getTitle.call(view));
-            }
-
-            if(this._stack.length > 1) {
-                var nav = $('.navitems.left', section);
-                if(!nav.children().length) {
-                    nav.append('<button class="back">Back</button>');
-                }
-            }
-
-            if(this._stack.length <= 1) {
-                $('.navitems.left button.back', section).remove();
-            }
-
-            centerTitle(section);
-        },
-
-        onPop: function(view) {
-            var section = $(view.el);
-            section.css({
-                left: section.width()
-            });
-
-            //var last = this._stack[this._stack.length-1];
-        }
-    });
+    var stack = new Stack();
 
     var EditView = Backbone.View.extend({
         events: {
@@ -229,14 +148,6 @@ define(function(require) {
         }
     });
 
-    $('header button.add').click(function() {
-        stack.push(editView);
-    });
-
-    $('header button.back').live('click', function() {
-        stack.pop();
-    });
-
     var Workspace = Backbone.Router.extend({
         routes: {
             "": "todos",
@@ -261,82 +172,14 @@ define(function(require) {
     window.app = new Workspace();
     Backbone.history.start();
 
-    function centerTitle(section) {
-        var header = section.children('header');
-        var leftSize = header.children('.navitems.left').width();
-        var rightSize = header.children('.navitems.right').width();
-        var margin = Math.max(leftSize, rightSize);
-        var width = section.width() - margin*2;
-        var title = header.children('h1');
+    var BasicView = Backbone.View.extend({
+        initMarkup: function() {
+            var appHeight = $(APP_SELECTOR).height();
 
-        var text = title.text();
-
-        if(text.length > 22) {
-            text = text.slice(0, 22) + '...';
-        }
-
-        var fontSize;
-        if(text.length <= 5) {
-            fontSize = 20;
-        }
-        else if(text.length >= 25) {
-            fontSize = 11;
-        }
-        else {
-            var l = text.length - 5;
-            var i = 1 - l / 20;
-
-            fontSize = 11 + (20 - 11) * i;
-        }
-
-        title.text(text);
-        title.css({ left: margin,
-                    width: width,
-                    fontSize: fontSize + 'pt' });
-    }
-
-    function initUI() {
-        $('#app > section').show();
-
-        $('section > header').each(function() {
-            var header = $(this);
-            var h1 = $('h1', header)[0];
-            var els = header.children();
-            var i = els.get().indexOf(h1);
-            var wrapper = '<div class="navitems"></div>';
-
-            els.slice(0, i).wrapAll($(wrapper).addClass('left'));
-            els.slice(i+1, els.length).wrapAll($(wrapper).addClass('right'));
-        });
-
-        var appHeight = $('#app').height();
-
-        $('#app > section').each(function() {
-            var el = $(this);
+            var el = $(this.el);
             el.width($('body').width());
 
-            if(!el.children('header').length) {
-                var first = el.children().first();
-                var header = $('<header></header>');
-
-                if(first.is('h1')) {
-                    first.wrap(header);
-                }
-                else {
-                    el.prepend(header);
-                    header.append('<h1>section</h1>');
-                }
-            }
-
-            var header = $('header', el);
-            if(!header.children('.navitems.left').length) {
-                header.prepend('<div class="navitems left"></div>');
-            }
-
-            if(!header.children('.navitems.right').length) {
-                header.append('<div class="navitems right"></div>');
-            }
-
+            var headerView = new Header(this.el);
             var header = el.children('header').remove();
 
             var contents = el.children();
@@ -350,28 +193,50 @@ define(function(require) {
 
             var height = el.children('header').height();
             el.children('.contents').css({ height: appHeight - height });
-        });
-    }
 
-    var editView, detailView, listView;
+            headerView.setTitle(header.children('h1').text());
+            this.header = headerView;
+        }
+    });
+
     var itemList = new ItemList();
 
     return {
         init: function(renderRow, renderDetail, renderEdit) {
-            initUI();
+            var app = new App({ el: $('#app') });
 
-            editView = new EditView({ el: $('#app > section.edit'),
-                                      render: renderEdit});
+            $('#app > section').each(function() {
+                var el = $(this);
+                var view;
 
-            detailView = new DetailView({ el: $('#app > section.detail'),
-                                          render: renderDetail });
+                if(el.is('.list')) {
+                    view = new ListView({ collection: list,
+                                          el: this,
+                                          render: renderRow });
+                }
+                else {
+                    view = new BasicView({ el: this });
+                }
+
+                view.initMarkup();
+            });
+
+
+            // editView = new EditView({ el: $('#app > section.edit'),
+            //                           render: renderEdit});
+
+            // detailView = new DetailView({ el: $('#app > section.detail'),
+            //                               render: renderDetail });
             
-            listView = new ListView({ collection: itemList,
-                                      el: $('#app > section.list'),
-                                      render: renderRow });
+            // listView = new ListView({ collection: itemList,
+            //                           el: $('#app > section.list'),
+            //                           render: renderRow });
+            
+            app.addView(listView);
+            app.addView(detailView);
+            app.addView(editView);
 
             stack.push(listView);
-            centerTitle($(listView.el));
         },
 
         addItem: function(item) {
