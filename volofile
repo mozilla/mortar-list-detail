@@ -267,7 +267,7 @@ module.exports = {
         var middleware = [
             lessMiddleware({ src: base }),
             connect.static(base),
-            connect.directory(base),
+            connect.directory(base)
         ];
 
         connect.logger.format("OpenWebApp",

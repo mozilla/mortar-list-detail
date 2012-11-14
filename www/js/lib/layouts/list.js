@@ -3,49 +3,14 @@ define(function(require) {
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var Stack = require('layouts/stack');
-    var Header = require('layouts/header');
-
-    var stack = new Stack();
-
+    var view = require('./view');
+    var stack = view.stack;
     var Item = Backbone.Model.extend({});
     var ItemList = Backbone.Collection.extend({
         model: Item
     });
 
-    var BasicView = Backbone.View.extend({
-        initialize: function() {
-            this.initMarkup();
-        },
-
-        initMarkup: function() {
-            var el = $(this.el);
-            var appEl = el.parent('x-app');
-            var appHeight = appEl.height();
-
-            el.width(appEl.width());
-
-            var headerView = new Header(this.el);
-            var header = el.children('header').remove();
-
-            var contents = el.children();
-            if(!contents.length) {
-                el.append('<div class="contents"></div>');
-            }
-            else {
-                contents.wrapAll('<div class="contents"></div>');
-            }
-            el.prepend(header);
-
-            var height = el.children('header').height();
-            el.children('.contents').css({ height: appHeight - height });
-
-            headerView.setTitle(header.children('h1').text());
-            this.header = headerView;
-        }
-    });
-
-    var ListView = BasicView.extend({
+    var ListView = view.BasicView.extend({
         initialize: function() {
             this.initMarkup();
             this.collection.bind('add', _.bind(this.appendItem, this));
@@ -88,7 +53,7 @@ define(function(require) {
             var titleField = this.options.titleField || 'title';
 
             if(this.options.render) {
-                this.options.render(this);
+                this.options.render.call(this.el, model);
             }
             else if(model.get(titleField)) {
                 this.el.innerHTML = model.get(titleField);
@@ -105,22 +70,11 @@ define(function(require) {
 
         open: function() {
             var opts = this.options;
-
-            var item = opts.parent.collection.get(this.model.id);
             var sel = opts.nextView || 'x-view.detail';
-            stack.push($(sel).get(0).view, item);
-        }
-    });
 
-
-    // TODO: see if I can get it to work with onCreate
-    xtag.register('x-view', {
-        onInsert: function() {
-            this.view = new BasicView({ el: this });
-
-            if(this.dataset.first == 'true') {
-                this.style.zIndex = 100;
-            }
+            var viewElement = $(sel).get(0);
+            viewElement.model = this.model;
+            stack.push(viewElement);
         }
     });
 
@@ -130,7 +84,12 @@ define(function(require) {
                                        collection: new ItemList() });
 
             if(this.dataset.first == 'true') {
-                stack.push(this.view);
+                stack.push(this);
+            }
+        },
+        getters: {
+            'collection': function() {
+                return this.view.collection;
             }
         },
         setters: {
@@ -138,10 +97,10 @@ define(function(require) {
                 this.view.opts.titleField = name;
             },
             'renderRow': function(func) {
-                this.view.opts.renderRow = func;
+                this.view.options.renderRow = func;
             },
             'nextView': function(sel) {
-                this.view.opts.nextView = sel;
+                this.view.options.nextView = sel;
             },
             'collection': function(col) {
                 this.view.collection = col;
@@ -150,6 +109,9 @@ define(function(require) {
         methods: {
             add: function(item) {
                 this.view.collection.add(item);
+            },
+            'pop': function() {
+                stack.pop();
             }
         }
     });

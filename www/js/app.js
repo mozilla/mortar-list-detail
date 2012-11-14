@@ -11,11 +11,16 @@ define(function(require) {
 
     // Write your app here.
 
-    //$('.delete').click(function() {});
-    
-    require('./list-detail2');
+    require('layouts/view');
+    require('layouts/list');
 
-    var list = $('x-listview.list').get(0);
+    function formatDate(d) {
+        return (d.getMonth()+1) + '/' +
+            d.getDate() + '/' +
+            d.getFullYear();
+    }
+
+    var list = $('.list').get(0);
     list.add({ id: 0,
                title: 'Cook yummy food',
                desc: 'COOK ALL THE THINGS',
@@ -29,26 +34,37 @@ define(function(require) {
                desc: 'Move this over there',
                date: new Date(12, 10, 1) });
 
-    // function formatDate(d) {
-    //     return (d.getMonth()+1) + '/' +
-    //         d.getDate() + '/' +
-    //         d.getFullYear();
-    // }
+    var detail = $('.detail').get(0);
+    detail.render = function(item) {
+        $('.title', this).text(item.get('title'));
+        $('.desc', this).text(item.get('desc'));
+        $('.date', this).text(formatDate(item.get('date')));
+    };
 
-    // function renderRow(view) {
-    //     var model = view.model;
-    //     view.el.innerHTML = model.get('title') + ' - ' +
-    //         '<strong>' + formatDate(model.get('date')) + '</strong>';
-    // }
+    var edit = $('.edit').get(0);
+    edit.render = function(item) {
+        $('input[name=id]', this).val(item.id);
+        $('input[name=title]', this).val(item.get('title'));
+        $('input[name=desc]', this).val(item.get('desc'));
+    };
 
-    // function renderDetail(view) {
-    //     var model = view.model;
-    //     var contents = $('.contents', view.el);
+    $('.edit button.add').click(function() {
+        var el = $(this);
+        var title = el.find('input[name=title]');
+        var desc = el.find('input[name=desc]');
+        var model = edit.model;
 
-    //     contents.children('.title').text(model.get('title'));
-    //     contents.children('.desc').text(model.get('desc'));
-    //     contents.children('.date').text(formatDate(model.get('date')));
-    // }
+        if(model) {
+            model.set({ title: title.val(), desc: desc.val() });
+        }
+        else {
+            list.add({ title: title,
+                       desc: desc,
+                       date: new Date() });
+        }
+
+        edit.pop();
+    });
 
     // function renderEdit(view) {
     //     var model = view.model;

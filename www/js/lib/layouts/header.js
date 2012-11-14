@@ -2,8 +2,9 @@
 define(function(require) {
     var $ = require('zepto');
 
-    function Header(parent) {
+    function Header(parent, stack) {
         parent = $(parent);
+        this.stack = stack;
 
         if(!parent.children('header').length) {
             var first = parent.children().first();
@@ -46,15 +47,22 @@ define(function(require) {
             el.append(rightWrapper);
         }
 
-        // el.find('button.add').click(function() {
-        //     stack.push(editView);
-        // });
+        var _this = this;
+        el.find('button').click(function() {
+            if(this.dataset.view) {
+                var view = $(this.dataset.view).get(0);
+                view.model = parent.get(0).model;
+                _this.stack.push(view);
+            }
+        });
 
         this.el = el.get(0);
     }
 
-    Header.prototype.addBack = function(stack) {
+    Header.prototype.addBack = function() {
         var nav = $('.navitems.left', this.el);
+        var stack = this.stack;
+
         if(!nav.children().length) {
             var back = $('<button class="back">Back</button>');
             nav.append(back);
