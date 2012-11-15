@@ -49,7 +49,7 @@ define(function(require) {
     };
 
     $('.edit button.add').click(function() {
-        var el = $(this);
+        var el = $(edit);
         var title = el.find('input[name=title]');
         var desc = el.find('input[name=desc]');
         var model = edit.model;
