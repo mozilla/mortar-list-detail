@@ -9,7 +9,7 @@ define(function(require) {
 
     var BasicView = Backbone.View.extend({
         stack: {
-            'open': 'open'
+            'open': 'onOpen'
         },
 
         initialize: function() {
@@ -59,7 +59,7 @@ define(function(require) {
             }
         },
 
-        open: function() {
+        onOpen: function() {
             // This method fires when this view appears in the app, so bind
             // the render function to the current model's change event
             if(this.model) {
@@ -67,6 +67,16 @@ define(function(require) {
             }
 
             this.render();
+        },
+
+        open: function(model) {
+            this.model = model;
+            stack.push(this.el);
+        },
+
+        close: function() {
+            this.model = null;
+            stack.pop();
         },
 
         render: function() {
@@ -109,11 +119,11 @@ define(function(require) {
             }
         },
         methods: {
-            'push': function() {
-                //this.view.
-            }
-            'pop': function() {
-                stack.pop();
+            'open': function(model) {
+                this.view.open(model);
+            },
+            'close': function() {
+                this.view.close();
             }
         }
     });

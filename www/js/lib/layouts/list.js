@@ -14,6 +14,7 @@ define(function(require) {
         initialize: function() {
             this.initMarkup();
             this.collection.bind('add', _.bind(this.appendItem, this));
+            this.collection.bind('reset', _.bind(this.render, this));
 
             $('.contents', this.el).append('<ul class="_list"></ul>');
             this.render();
@@ -73,8 +74,7 @@ define(function(require) {
             var sel = opts.nextView || 'x-view.detail';
 
             var viewElement = $(sel).get(0);
-            viewElement.model = this.model;
-            stack.push(viewElement);
+            viewElement.open(this.model);
         }
     });
 
@@ -88,21 +88,21 @@ define(function(require) {
             }
         },
         getters: {
-            'collection': function() {
+            collection: function() {
                 return this.view.collection;
             }
         },
         setters: {
-            'titleField': function(name) {
+            titleField: function(name) {
                 this.view.opts.titleField = name;
             },
-            'renderRow': function(func) {
+            renderRow: function(func) {
                 this.view.options.renderRow = func;
             },
-            'nextView': function(sel) {
+            nextView: function(sel) {
                 this.view.options.nextView = sel;
             },
-            'collection': function(col) {
+            collection: function(col) {
                 this.view.collection = col;
             }
         },
@@ -110,7 +110,7 @@ define(function(require) {
             add: function(item) {
                 this.view.collection.add(item);
             },
-            'pop': function() {
+            pop: function() {
                 stack.pop();
             }
         }

@@ -20,6 +20,8 @@ define(function(require) {
             d.getFullYear();
     }
 
+    // List view
+
     var list = $('.list').get(0);
     list.add({ id: 0,
                title: 'Cook yummy food',
@@ -34,6 +36,16 @@ define(function(require) {
                desc: 'Move this over there',
                date: new Date(12, 10, 1) });
 
+    $('button.refresh', list).click(function() {
+        // Do nothing right now
+    });
+
+    $('button.add', list).click(function() {
+        edit.open();
+    });
+    
+    // Detail view
+
     var detail = $('.detail').get(0);
     detail.render = function(item) {
         $('.title', this).text(item.get('title'));
@@ -41,14 +53,18 @@ define(function(require) {
         $('.date', this).text(formatDate(item.get('date')));
     };
 
+    // Edit view
+
     var edit = $('.edit').get(0);
     edit.render = function(item) {
+        item = item || { id: '', get: function() { return ''; } };
+
         $('input[name=id]', this).val(item.id);
         $('input[name=title]', this).val(item.get('title'));
         $('input[name=desc]', this).val(item.get('desc'));
     };
 
-    $('.edit button.add').click(function() {
+    $('button.add', edit).click(function() {
         var el = $(edit);
         var title = el.find('input[name=title]');
         var desc = el.find('input[name=desc]');
@@ -63,19 +79,6 @@ define(function(require) {
                        date: new Date() });
         }
 
-        edit.pop();
+        edit.close();
     });
-
-    // function renderEdit(view) {
-    //     var model = view.model;
-    //     var el = $(this.el);
-
-    //     if(model) {
-    //         el.find('input[name=id]').val(model.id);
-    //         el.find('input[name=title]').val(model.get('title'));
-    //         el.find('input[name=desc]').val(model.get('desc'));
-    //     }
-    // }
-
-    // app.init(renderRow, renderDetail, renderEdit);
 });
