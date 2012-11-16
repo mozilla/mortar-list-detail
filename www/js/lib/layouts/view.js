@@ -20,9 +20,6 @@ define(function(require) {
             // TODO: clean this up and simplify expansion
             var el = $(this.el);
             var appEl = el.parent('x-app');
-            var appHeight = appEl.height();
-
-            el.width(appEl.width());
 
             var headerView = new Header(this.el, stack);
             var header = el.children('header').remove();
@@ -36,11 +33,26 @@ define(function(require) {
             }
             el.prepend(header);
 
-            var height = el.children('header').height();
-            el.children('.contents').css({ height: appHeight - height });
-
+            this.onResize();
+            
             headerView.setTitle(header.children('h1').text());
             this.header = headerView;
+        },
+
+        onResize: function() {
+            var el = $(this.el);
+            var appEl = el.parent('x-app');
+            
+            // Width
+            el.width(appEl.width());
+
+            // Height (minus the header)
+            var height = el.children('header').height();
+            el.children('.contents').css({ height: appEl.height() - height });
+
+            if(this.header) {
+                this.header.setTitle(this.header.getTitle());
+            }
         },
 
         setTitle: function() {
@@ -118,6 +130,14 @@ define(function(require) {
             'render': function(func) {
                 this.view.options.render = func;
             },
+            'getTitle': function(func) {
+                this.view.getTitle = function() {
+                    // It should be called with "this" as the element,
+                    // not the view, since that's what it looks like
+                    // from the user perspective
+                    return func.call(this.el);
+                };
+            },
             'model': function(model) {
                 this.view.model = model;
             }
@@ -131,6 +151,18 @@ define(function(require) {
             }
         }
     });
+
+    window.onresize = function() {
+        // TODO: figure out better way to do this
+        var els = 'x-view, x-listview';
+        $(els).each(function() {
+            if(!stack.find(this)) {
+                $(this).css({ zIndex: 0 });
+            }
+            
+            this.view.onResize();
+        });
+    };
 
     return {
         stack: stack,

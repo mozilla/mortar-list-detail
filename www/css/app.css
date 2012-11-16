@@ -5,7 +5,17 @@
 /* @import "install-button.css"; */
 /* @import "layouts.css"; */
 
+@import "fonts.css";
+
 /* Your styles here */
+
+body {
+    font-family: 'MozTTLight', Verdana, sans-serif;
+}
+
+h1 {
+    font: 2.2rem/4.8rem "Open Sans", Sans-serif;
+}
 
 x-view.detail .contents, x-view.edit .contents {
     padding: 1em;

@@ -85,28 +85,30 @@ define(function(require) {
         var margin = Math.max(leftSize, rightSize);
         var width = el.width() - margin*2;
 
-        if(text.length > 22) {
-            text = text.slice(0, 19) + '...';
-        }
+        // DYNAMIC FONT SIZES: Turn off for now.
+        // 
+        // var fontSize;
+        // if(text.length <= 5) {
+        //     fontSize = 20;
+        // }
+        // else if(text.length >= 25) {
+        //     fontSize = 11;
+        // }
+        // else {
+        //     var l = text.length - 5;
+        //     var i = 1 - l / 20;
 
-        var fontSize;
-        if(text.length <= 5) {
-            fontSize = 20;
-        }
-        else if(text.length >= 25) {
-            fontSize = 11;
-        }
-        else {
-            var l = text.length - 5;
-            var i = 1 - l / 20;
+        //     fontSize = 11 + (20 - 11) * i;
+        // }
 
-            fontSize = 11 + (20 - 11) * i;
+        if(text.length > 14) {
+            text = text.slice(0, 11) + '...';
         }
 
         title.text(text);
         title.css({ left: margin,
                     width: width,
-                    fontSize: fontSize + 'pt' });
+                    fontSize: '20pt' });
     };
 
     Header.prototype.getTitle = function() {

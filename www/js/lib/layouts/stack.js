@@ -71,5 +71,15 @@ define(function(require) {
         }
     };
 
+    ViewStack.prototype.iterate = function(func) {
+        this._stack.forEach(function(viewDOM) {
+            func(viewDOM);
+        });
+    };
+
+    ViewStack.prototype.find = function(el) {
+        return this._stack.indexOf(el) !== -1;
+    };
+
     return ViewStack;
 });

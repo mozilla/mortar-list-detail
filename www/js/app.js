@@ -23,16 +23,13 @@ define(function(require) {
     // List view
 
     var list = $('.list').get(0);
-    list.add({ id: 0,
-               title: 'Cook yummy food',
+    list.add({ title: 'Cook yummy food',
                desc: 'COOK ALL THE THINGS',
                date: new Date() });
-    list.add({ id: 1,
-               title: 'Make things',
+    list.add({ title: 'Make things',
                desc: 'Make this look like that',
                date: new Date(12, 9, 5) });
-    list.add({ id: 2,
-               title: 'Move stuff',
+    list.add({ title: 'Move stuff',
                desc: 'Move this over there',
                date: new Date(12, 10, 1) });
 
@@ -64,6 +61,17 @@ define(function(require) {
         $('input[name=desc]', this).val(item.get('desc'));
     };
 
+    edit.getTitle = function() {
+        var model = this.view.model;
+
+        if(model) {
+            return model.get('title');
+        }
+        else {
+            return 'New';
+        }
+    };
+
     $('button.add', edit).click(function() {
         var el = $(edit);
         var title = el.find('input[name=title]');
@@ -74,8 +82,8 @@ define(function(require) {
             model.set({ title: title.val(), desc: desc.val() });
         }
         else {
-            list.add({ title: title,
-                       desc: desc,
+            list.add({ title: title.val(),
+                       desc: desc.val(),
                        date: new Date() });
         }
 
