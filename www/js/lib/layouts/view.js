@@ -119,18 +119,18 @@ define(function(require) {
             }
         },
         getters: {
-            'model': function() {
+            model: function() {
                 return this.view.model;
             }
         },
         setters: {
-            'titleField': function(name) {
+            titleField: function(name) {
                 this.view.options.titleField = name;
             },
-            'render': function(func) {
+            render: function(func) {
                 this.view.options.render = func;
             },
-            'getTitle': function(func) {
+            getTitle: function(func) {
                 this.view.getTitle = function() {
                     // It should be called with "this" as the element,
                     // not the view, since that's what it looks like
@@ -138,15 +138,15 @@ define(function(require) {
                     return func.call(this.el);
                 };
             },
-            'model': function(model) {
+            model: function(model) {
                 this.view.model = model;
             }
         },
         methods: {
-            'open': function(model) {
+            open: function(model) {
                 this.view.open(model);
             },
-            'close': function() {
+            close: function() {
                 this.view.close();
             }
         }

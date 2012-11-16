@@ -110,7 +110,10 @@ define(function(require) {
             add: function(item) {
                 this.view.collection.add(item);
             },
-            pop: function() {
+            open: function(model) {
+                this.view.open(model);
+            },
+            close: function() {
                 stack.pop();
             }
         }
