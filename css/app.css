@@ -1,0 +1,29 @@
+
+@font-face {  
+  font-family: 'MozTTLight';  
+  src: url(fonts/MozTT%20Light.ttf) format("truetype");  
+}  
+body {
+    font-family: 'MozTTLight', Verdana, sans-serif;
+}
+h1 {
+    font: 2.2rem/4.8rem "Open Sans", Sans-serif;
+}
+x-view.detail .contents, x-view.edit .contents {
+    padding: 1em;
+}
+x-view.detail .contents h1 {
+    margin: 0;
+}
+x-view.edit .field {
+    margin-top: 1em;
+}
+x-listview.list li:before {
+    content: ' ';
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background: url(../img/glyphicons-halflings.png) no-repeat -95px -2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
