@@ -29,7 +29,7 @@ For the HTML side of things, the layout library introduces three tags:
 
 * **`x-app`**: A root element for your app
 * **`x-view`**: Represents a "page" in your app, and binds to a Backbone view
-* **`x-listview`**: Inherits `x-view` and adds functionality for managing a list
+* **`x-listview`**: Inherits x-view and adds functionality for managing a list
 
 The `x-view` and `x-listview` tags can have a `header` element which specifies what should be in the header. Add buttons to your liking!
 
