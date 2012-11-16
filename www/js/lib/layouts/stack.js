@@ -24,12 +24,7 @@ define(function(require) {
             view.header.addBack(this);
         }
 
-        if(view.getTitle) {
-            view.header.setTitle(view.getTitle.call(view));
-        }
-        else {
-            view.setTitle();
-        }
+        view.setTitle();
     };
 
     ViewStack.prototype.animatePush = function(viewDOM) {

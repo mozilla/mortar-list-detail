@@ -56,6 +56,7 @@ define(function(require) {
             }
         });
 
+        this.text = $(h1).text();
         this.el = el.get(0);
     }
 
@@ -74,6 +75,8 @@ define(function(require) {
     };
 
     Header.prototype.setTitle = function(text) {
+        this.text = text;
+
         var el = $(this.el);
         var title  = el.children('h1');
 
@@ -83,7 +86,7 @@ define(function(require) {
         var width = el.width() - margin*2;
 
         if(text.length > 22) {
-            text = text.slice(0, 22) + '...';
+            text = text.slice(0, 19) + '...';
         }
 
         var fontSize;
@@ -104,6 +107,10 @@ define(function(require) {
         title.css({ left: margin,
                     width: width,
                     fontSize: fontSize + 'pt' });
+    };
+
+    Header.prototype.getTitle = function() {
+        return this.text;
     };
 
     return Header;

@@ -46,17 +46,21 @@ define(function(require) {
         setTitle: function() {
             var titleField = this.options.titleField || 'title';
             var model = this.model;
+            var text;
 
-            if(model) {
-                if(model.get(titleField)) {
-                    this.header.setTitle(model.get(titleField));
-                }
-                else {
-                    console.log('[BasicView] WARNING: item does not have ' +
-                                'a "title" field and the titleField property ' +
-                                'is not set. Unable to set header title.');
-                }
+            if(this.getTitle) {
+                text = this.getTitle();
             }
+            else if(model && model.get(titleField)) {
+                text = model.get(titleField);
+            }
+            else {
+                // Since the header may have changed (buttons, etc),
+                // reorient the header anyway
+                text = this.header.getTitle();
+            }
+
+            this.header.setTitle(text);
         },
 
         onOpen: function() {
