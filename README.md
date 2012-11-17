@@ -5,7 +5,7 @@ This template comes with a new layouts library that lets you create apps quickly
 
 It uses [backbone.js](http://backbonejs.org/), [zepto](http://zeptojs.com/), and [underscore](http://underscorejs.org/) to provide a powerful yet minimal application development environment.
 
-It also make light usags of [x-tags](https://github.com/mozilla/x-tag), a polyfill for the new [Web Components](http://dvcs.w3.org/hg/webcomponents/raw-file/tip/explainer/index.html) API.
+It also make light usage of [x-tags](https://github.com/mozilla/x-tag), a polyfill for the new [Web Components](http://dvcs.w3.org/hg/webcomponents/raw-file/tip/explainer/index.html) API.
 
 [Check out what the template is by default](http://mozilla.github.com/mortar-list-detail/)
 
