@@ -28,6 +28,8 @@ View the list/detail app at http://localhost:8008/.
 
 # Customizing
 
+## HTML
+
 You'll probably want to change how this template works to build your app. You can do that be working with the [backbone](http://backbonejs.org/) structure underlying the whole thing.
 
 For the HTML side of things, the layout library introduces two tags:
@@ -58,6 +60,8 @@ This creates a page with a header with the title "Item" and a button with the te
 
 View the [example HTML](https://github.com/mozilla/mortar-list-detail/blob/master/www/index.html) included in the project.
 
+## Javascript
+
 For the javascript side of things, you just grab those DOM tags and do stuff with them. Here are the javascript API's:
 
 **`x-view`**:
@@ -66,18 +70,20 @@ For the javascript side of things, you just grab those DOM tags and do stuff wit
 * `view.render = function(item) { ... }` -- Set the function for rendering the view
 * `view.getTitle = function() { ... }` -- Set the function for dynamically generating a title
 * `view.model` -- Get or set the model
-* `view.open()` -- Open the view
-* `view.close()` -- Close the view
+* `view.onOpen = function() { ... }` -- set a callback for when the view is opened
+* `view.open(model, anim)` -- Open the view with the model and animation (both are optional)
+* `view.close(anim)` -- Close the view with the animation (optional)
+
+The currently available animations are `instant`, `instantOut`, `slideLeft`, and `slideRightOut`.
 
 **`x-listview`**:
 
-* `view.titleField = 'title'` -- Set the item field for the title
+All of the properties/methods from `x-view` are available except `render` and `model`. The following are additional properties/methods:
+
 * `view.renderRow = function(item) { ... }` -- Set the function for rendering a row
 * `view.nextView = function(sel) { ... }` -- Set the view to open when a row is selected (as a CSS selector)
 * `view.collection` -- Get or set the view's collection
 * `view.add(item)` -- Add an item (either a javascript dict or a Backbone model)
-* `view.open()` -- Open the view
-* `view.close()` -- Close the view
 
 [View the example code](https://github.com/mozilla/mortar-list-detail/blob/master/www/js/app.js) that comes by default.
 
