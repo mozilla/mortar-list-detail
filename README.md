@@ -30,13 +30,31 @@ View the list/detail app at http://localhost:8008/.
 
 You'll probably want to change how this template works to build your app. You can do that be working with the [backbone](http://backbonejs.org/) structure underlying the whole thing.
 
-For the HTML side of things, the layout library introduces three tags:
+For the HTML side of things, the layout library introduces two tags:
 
-* **`x-app`**: A root element for your app
-* **`x-view`**: Represents a "page" in your app, and binds to a Backbone view
+* **`x-view`**: Represents a "page" in your app, or any chunk of content that needs a header and/or footer. Automatically links to a Backbone view.
 * **`x-listview`**: Inherits x-view and adds functionality for managing a list
 
-The `x-view` and `x-listview` tags can have a `header` element which specifies what should be in the header. Add buttons to your liking!
+The `x-view` and `x-listview` tags can have a `header` and/or `footer` element. An `h1` tag in a header specifies the titles, and `button` tags add buttons. Use the `data-view` attribute on a button to make the app automatically open a different view when the button is pressed. Example:
+
+```html
+<x-view class="detail">
+  <header>
+    <h1>Item</h1>
+    <button data-view="x-view.edit">Edit</button>
+  </header>
+
+  <h1 class="title"></h1>
+  <p class="desc"></p>
+  <p class="date"></p>
+
+  <footer>
+    <button data-view="x-view.delete">Delete</button>
+  </footer>  
+</x-view>
+```
+
+This creates a page with a header with the title "Item" and a button with the text "Edit" that brings up the edit view when pressed, and a footer with a "Delete" button that brings up the delete view. The `data-view` attribute specifies a CSS selector to select a different view.
 
 View the [example HTML](https://github.com/mozilla/mortar-list-detail/blob/master/www/index.html) included in the project.
 
