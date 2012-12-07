@@ -49,10 +49,11 @@ define(function(require) {
             var contents = $(nodes);
 
             if(!contents.length) {
-                el.append('<div class="contents"></div>');
+                el.append('<div class="_contents"><div class="contents"></div></div>');
             }
             else {
                 contents.wrapAll('<div class="contents"></div>');
+                el.children('.contents').wrap('<div class="_contents"></div>');
             }
 
             if(this.header) {
@@ -75,7 +76,14 @@ define(function(require) {
 
         onResize: function() {
             var el = $(this.el);
-            var appEl = el.parent();
+
+            // The parent element is the closest ._contents if exists,
+            // otherwise the immediate parent
+            var appEl = el.parents('._contents').first();            
+            if(!appEl.length) {
+                appEl = el.parent();
+            }
+
             var appHeight = appEl.height();
 
             // Width
@@ -84,7 +92,7 @@ define(function(require) {
             // Height (minus the header and footer)
             var height = (el.children('header').height() +
                           el.children('footer').height());
-            el.children('.contents').css({ height: appHeight - height });
+            el.children('._contents').css({ height: appHeight - height });
 
             if(this.header) {
                 this.header.setTitle(this.header.getTitle());

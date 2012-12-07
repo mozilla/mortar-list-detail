@@ -24,14 +24,14 @@ body {
   border-top: 1px solid grey;
   cursor: pointer;
 }
-x-view,
-x-listview {
-  background-color: white;
-}
-#app .contents {
+#app ._contents {
   display: block;
   width: 100%;
   height: 100%;
+}
+x-view,
+x-listview {
+  background-color: white;
 }
 x-view > header,
 x-listview > header,
@@ -83,12 +83,6 @@ x-listview > header .navitems.left button {
   margin-left: .5em;
   margin-right: 0;
 }
-x-view > .contents,
-x-listview > .contents {
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
 x-view > header h1,
 x-listview > header h1 {
   margin: 0;
@@ -97,4 +91,10 @@ x-listview > header h1 {
   font-size: 2em;
   line-height: 32pt;
   text-align: center;
+}
+x-view > ._contents,
+x-listview > ._contents {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

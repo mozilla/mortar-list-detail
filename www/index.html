@@ -21,34 +21,31 @@
     <div class="loading">Loading...</div>
     
     <x-view id="app">
-      <x-view class="detail">
-        <!-- <header> -->
-        <!--   <h1>he</h1> -->
-        <!--   <button data-view="x-view.edit">Edit</button> -->
-        <!-- </header> -->
-        
-        <!-- <h1 class="title"></h1> -->
-        <!-- <p class="desc"></p> -->
-        <!-- <p class="date"></p> -->
+      <x-listview class="list">
+        <header>
+          <button class="refresh">Refresh</button>
+          <h1>My Items</h1>
+          <button class="add">+</button>
+        </header>
+      </x-listview>
 
-        Hello
+      <x-view class="detail">
+        <header>
+          <h1>he</h1>
+          <button data-view="x-view.edit">Edit</button>
+        </header>
+        
+        <h1 class="title"></h1>
+        <p class="desc"></p>
+        <p class="date"></p>
       </x-view>
 
-      <!-- <x-listview class="list"> -->
-      <!--   <header> -->
-      <!--     <button class="refresh">Refresh</button> -->
-      <!--     <h1>My Items</h1> -->
-      <!--     <button class="add">+</button> -->
-      <!--   </header> -->
-      <!-- </x-listview> -->
-
-
-      <!-- <x-view class="edit"> -->
-      <!--   <header><h1>Edit</h1></header> -->
-      <!--   <div class="field">Title: <input type="text" name="title" /></div> -->
-      <!--   <div class="field">Description: <input type="text" name="desc" /></div> -->
-      <!--   <button type="submit" class="add">Add</button> -->
-      <!-- </x-view> -->
+      <x-view class="edit">
+        <header><h1>Edit</h1></header>
+        <div class="field">Title: <input type="text" name="title" /></div>
+        <div class="field">Description: <input type="text" name="desc" /></div>
+        <button type="submit" class="add">Add</button>
+      </x-view>
 
       <footer>
         <button>poop</button>
