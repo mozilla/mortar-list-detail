@@ -18,8 +18,10 @@
          through the marketpace (see app.js) -->
     <!-- <button id="install-btn">Install</button>     -->
 
-    <x-app>
-      <x-listview class="list" data-first="true">
+    <div class="loading">Loading...</div>
+    
+    <x-view id="app">
+      <x-listview class="list">
         <header>
           <button class="refresh">Refresh</button>
           <h1>My Items</h1>
@@ -29,7 +31,7 @@
 
       <x-view class="detail">
         <header>
-          <h1></h1>
+          <h1>he</h1>
           <button data-view="x-view.edit">Edit</button>
         </header>
         
@@ -39,12 +41,16 @@
       </x-view>
 
       <x-view class="edit">
-        <h1>Edit</h1>
+        <header><h1>Edit</h1></header>
         <div class="field">Title: <input type="text" name="title" /></div>
         <div class="field">Description: <input type="text" name="desc" /></div>
         <button type="submit" class="add">Add</button>
       </x-view>
-    </x-app>
+
+      <footer>
+        <button>poop</button>
+      </footer>
+    </x-view>
 
     <!-- Using require.js, a module system for javascript, include the
          js files. This loads "main.js", which in turn can load other

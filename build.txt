@@ -24,8 +24,10 @@ js/lib/../install-button.js
 js/lib/zepto.js
 js/lib/underscore.js
 js/lib/backbone.js
+js/lib/layouts/anim.js
 js/lib/layouts/header.js
-js/lib/layouts/stack.js
+js/lib/layouts/footer.js
 js/lib/layouts/view.js
+js/lib/layouts/app.js
 js/lib/layouts/list.js
 js/lib/../app.js

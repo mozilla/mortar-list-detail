@@ -3,6 +3,9 @@
   font-family: 'MozTTLight';  
   src: url(fonts/MozTT%20Light.ttf) format("truetype");  
 }  
+html, body {
+    height: 100%;
+}
 body {
     font-family: 'MozTTLight', Verdana, sans-serif;
 }
