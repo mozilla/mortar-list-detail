@@ -38,7 +38,7 @@ define(function(require) {
     });
 
     $('button.add', list).click(function() {
-        edit.open();
+        edit.open(null, 'slideLeft');
     });
     
     // Detail view
@@ -87,6 +87,6 @@ define(function(require) {
                        date: new Date() });
         }
 
-        edit.close();
+        edit.close('slideRightOut');
     });
 });

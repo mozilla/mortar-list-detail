@@ -1,18 +1,24 @@
 
 define(function(require) {
+    require('layouts/app');
+
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var view = require('./view');
-    var stack = view.stack;
+    var BasicView = require('./view');
     var Item = Backbone.Model.extend({});
     var ItemList = Backbone.Collection.extend({
         model: Item
     });
 
-    var ListView = view.BasicView.extend({
+    var ListView = BasicView.extend({
         initialize: function() {
             this.initMarkup();
+            this._stack = [];
+
+            var p = $(this.el).parents('x-view').get(0);
+            this.parent = p ? p.view : BasicView.globalObject;
+
             this.collection.bind('add', _.bind(this.appendItem, this));
             this.collection.bind('reset', _.bind(this.render, this));
 
@@ -74,17 +80,28 @@ define(function(require) {
             var sel = opts.nextView || 'x-view.detail';
 
             var viewElement = $(sel).get(0);
-            viewElement.open(this.model);
+
+            if(viewElement) {
+                viewElement.open(this.model, 'slideLeft');
+            }
         }
     });
 
     xtag.register('x-listview', {
-        onInsert: function() {
-            this.view = new ListView({ el: this,
-                                       collection: new ItemList() });
+        onCreate: function() {
+            var view = this.view = new ListView({ el: this,
+                                                  collection: new ItemList() });
 
-            if(this.dataset.first == 'true') {
-                stack.push(this);
+            // Automatically display the first view in the set
+            var first = false;
+            if(view.parent.el) {
+                var subViews = $(view.parent.el).find('x-view, x-listview');
+                first = subViews.get(0) == view.el;
+            }
+
+            if(this.dataset.first == 'true' || first) {
+                view.parent.clearStack();
+                view.open();
             }
         },
         getters: {
@@ -110,11 +127,11 @@ define(function(require) {
             add: function(item) {
                 this.view.collection.add(item);
             },
-            open: function(model) {
-                this.view.open(model);
+            open: function(model, anim) {
+                this.view.open(model, anim);
             },
-            close: function() {
-                stack.pop();
+            close: function(anim) {
+                this.view.close(anim);
             }
         }
     });

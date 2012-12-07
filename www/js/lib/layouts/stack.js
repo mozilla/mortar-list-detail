@@ -1,14 +1,23 @@
 
 define(function(require) {
+    var anims = require('./anim');
+
     function ViewStack() {
     }
 
     ViewStack.prototype.push = function(viewDOM) {
-        if(!this._stack) {
-            this._stack = [];
+        var stack = this._stack;
+
+        if(!stack) {
+            stack = this._stack = [];
         }
 
-        this._stack.push(viewDOM);
+        // If it's already in the stack, don't do anything
+        if(stack.indexOf(viewDOM) !== -1) {
+            return;
+        }
+
+        stack.push(viewDOM);
 
         var view = viewDOM.view;
         var methods = view.stack;
@@ -20,34 +29,16 @@ define(function(require) {
 
         this.animatePush(viewDOM);
 
-        if(this._stack.length > 1) {
+        if(stack.length > 1 && view.header) {
             view.header.addBack(this);
         }
-
-        view.setTitle();
     };
 
     ViewStack.prototype.animatePush = function(viewDOM) {
         viewDOM = $(viewDOM);
 
         if(this._stack.length > 1) {
-            // For now, hardcode a slide in animation. If we end up
-            // using this library a lot we can offer various animations.
-            var startLeft = viewDOM.width();
-
-            viewDOM.removeClass('moving');
-            viewDOM.css({
-                left: startLeft
-            });
-
-            // Triggers a layout which forces the above style to be
-            // applied before the transition starts
-            var forced = viewDOM[0].offsetLeft;
-
-            viewDOM.addClass('moving');
-            viewDOM.css({
-                left: 0
-            });
+            anim.slideLeft(viewDOM);
         }
 
         viewDOM.css({ zIndex: 100 + this._stack.length });

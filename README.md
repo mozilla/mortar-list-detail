@@ -3,6 +3,9 @@
 
 This template comes with a new layouts library that lets you create apps quickly, and initial HTML and javascript that defines a list/detail application.
 
+It is part of the [mortar](https://github.com/mozilla/mortar/)
+template collection for building Open Web Apps.
+
 It uses [backbone.js](http://backbonejs.org/), [zepto](http://zeptojs.com/), and [underscore](http://underscorejs.org/) to provide a powerful yet minimal application development environment.
 
 It also make light usage of [x-tags](https://github.com/mozilla/x-tag), a polyfill for the new [Web Components](http://dvcs.w3.org/hg/webcomponents/raw-file/tip/explainer/index.html) API.

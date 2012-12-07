@@ -3,59 +3,111 @@ define(function(require) {
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
+    var anims = require('./anim');
     var Header = require('./header');
-    var Stack = require('./stack');
-    var stack = new Stack();
+    var Footer = require('./footer');
+
+    var globalObject = {
+        _stack: [],
+        stackSize: function() {
+            return globalObject._stack.length;
+        },
+        clearStack: function() {
+            var stack = globalObject._stack;
+
+            while(stack.length) {
+                stack[stack.length - 1].close();
+            }
+        }
+    };
 
     var BasicView = Backbone.View.extend({
-        stack: {
-            'open': 'onOpen'
-        },
-
         initialize: function() {
+            this._stack = [];
+            
+            var p = $(this.el).parents('x-view').get(0);
+            this.parent = p ? p.view : globalObject;
             this.initMarkup();
         },
 
         initMarkup: function() {
-            // TODO: clean this up and simplify expansion
             var el = $(this.el);
-            var appEl = el.parent('x-app');
 
-            var headerView = new Header(this.el, stack);
-            var header = el.children('header').remove();
+            if(el.children('header').length) {
+                this.header = new Header(this);
+                el.children('header').remove();
+            }
 
-            var contents = el.children();
+            if(el.children('footer').length) {
+                this.footer = new Footer(this);
+                el.children('footer').remove();
+            }
+
+            // We need to manipulate all of the child nodes, including
+            // text nodes
+            var nodes = Array.prototype.slice.call(el[0].childNodes);
+            var contents = $(nodes);
+
             if(!contents.length) {
                 el.append('<div class="contents"></div>');
             }
             else {
                 contents.wrapAll('<div class="contents"></div>');
             }
-            el.prepend(header);
 
+            if(this.header) {
+                el.prepend(this.header.el);
+            }
+
+            if(this.footer) {
+                el.append(this.footer.el);
+            }
+
+            // Position the view (not done in css because we don't
+            // want a "pop" when the page loads)
+            el.css({
+                position: 'absolute',
+                top: 0,
+                left: 0
+            });
             this.onResize();
-            
-            headerView.setTitle(header.children('h1').text());
-            this.header = headerView;
         },
 
         onResize: function() {
             var el = $(this.el);
-            var appEl = el.parent('x-app');
-            
+            var appEl = el.parent();
+            var appHeight = appEl.height();
+
             // Width
             el.width(appEl.width());
 
-            // Height (minus the header)
-            var height = el.children('header').height();
-            el.children('.contents').css({ height: appEl.height() - height });
+            // Height (minus the header and footer)
+            var height = (el.children('header').height() +
+                          el.children('footer').height());
+            el.children('.contents').css({ height: appHeight - height });
 
             if(this.header) {
                 this.header.setTitle(this.header.getTitle());
             }
         },
 
+        stackSize: function() {
+            return this._stack.length;
+        },
+
+        clearStack: function() {
+            var stack = this._stack;
+
+            while(stack.length) {
+                stack[stack.length - 1].close();
+            }
+        },
+
         setTitle: function() {
+            if(!this.header) {
+                return;
+            }
+
             var titleField = this.options.titleField || 'title';
             var model = this.model;
             var text;
@@ -75,7 +127,33 @@ define(function(require) {
             this.header.setTitle(text);
         },
 
-        onOpen: function() {
+        open: function(model, anim) {
+            anim = anim || 'instant';
+            var stack = this.parent._stack;
+
+            if(stack.indexOf(this.el) !== -1) {
+                // It's already in the stack, do nothing
+                return;
+            }
+
+            if(anims[anim]) {
+                anims[anim](this.el);
+            }
+            else {
+                console.log('WARNING: invalid animation: ' + anim);
+            }
+
+            if(stack.length && this.header) {
+                this.header.addBack(this);
+            }
+            else if(this.header) {
+                this.header.removeBack();
+            }
+
+            stack.push(this.el);
+            this.model = model;
+            this.setTitle();
+
             // This method fires when this view appears in the app, so bind
             // the render function to the current model's change event
             if(this.model) {
@@ -85,16 +163,31 @@ define(function(require) {
             this.render();
         },
 
-        open: function(model) {
+        openAlone: function(model, anim) {
+            anim = anim || 'instant';
+            anims[anim](this.el);
+
+            if(this.header) {
+                this.header.removeBack();
+            }
+
             this.model = model;
-            stack.push(this.el);
+            this.setTitle();
         },
 
-        close: function() {
+        close: function(anim) {
+            anim = anim || 'instantOut';
+            var stack = this.parent._stack;
+            var lastIdx = stack.length - 1;
+
+            if(stack[lastIdx] == this.el) {
+                stack.pop();
+            }
+            
+            anims[anim](this.el);
             this.model = null;
-            stack.pop();
         },
-
+        
         render: function() {
             var model = this.model;
 
@@ -109,13 +202,16 @@ define(function(require) {
         }
     });
 
-    // TODO: see if I can get it to work with onCreate
     xtag.register('x-view', {
-        onInsert: function() {
-            this.view = new BasicView({ el: this });
-
+        onCreate: function() {
+            var view = this.view = new BasicView({ el: this });
+            
             if(this.dataset.first == 'true') {
-                stack.push(this);
+                view.parent.clearStack();
+                view.open();
+            }
+            else if(!view.parent.stackSize()) {
+                view.open();
             }
         },
         getters: {
@@ -143,29 +239,23 @@ define(function(require) {
             }
         },
         methods: {
-            open: function(model) {
-                this.view.open(model);
+            open: function(model, anim) {
+                this.view.open(model, anim);
             },
-            close: function() {
-                this.view.close();
+            close: function(anim) {
+                this.view.close(anim);
             }
         }
     });
 
     window.onresize = function() {
-        // TODO: figure out better way to do this
         var els = 'x-view, x-listview';
         $(els).each(function() {
-            if(!stack.find(this)) {
-                $(this).css({ zIndex: 0 });
-            }
-            
             this.view.onResize();
         });
     };
 
-    return {
-        stack: stack,
-        BasicView: BasicView
-    };
+    BasicView.globalObject = globalObject;
+
+    return BasicView;
 });
