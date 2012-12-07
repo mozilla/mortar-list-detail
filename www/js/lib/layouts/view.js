@@ -136,6 +136,9 @@ define(function(require) {
         },
 
         open: function(model, anim) {
+            // Open a view and push it on the parent view's navigation
+            // stack
+
             anim = anim || 'instant';
             var stack = this.parent._stack;
 
@@ -164,16 +167,30 @@ define(function(require) {
 
             // This method fires when this view appears in the app, so bind
             // the render function to the current model's change event
+            // TODO: could this add multiple even listeners, and
+            // should it be done in `openAlone` also?
             if(this.model) {
                 this.model.on('change', _.bind(this.render, this));
             }
 
             this.render();
+
+            if(this.onOpen) {
+                this.onOpen(this);
+            }
         },
 
         openAlone: function(model, anim) {
+            // Open a view but don't put it on the stack
+
             anim = anim || 'instant';
-            anims[anim](this.el);
+
+            if(anims[anim]) {
+                anims[anim](this.el);
+            }
+            else {
+                console.log('WARNING: invalid animation: ' + anim);
+            }
 
             if(this.header) {
                 this.header.removeBack();
@@ -181,6 +198,11 @@ define(function(require) {
 
             this.model = model;
             this.setTitle();
+            this.render();
+
+            if(this.onOpen) {
+                this.onOpen(this);
+            }
         },
 
         close: function(anim) {
@@ -244,6 +266,9 @@ define(function(require) {
             },
             model: function(model) {
                 this.view.model = model;
+            },
+            onOpen: function(func) {
+                this.view.onOpen = func;
             }
         },
         methods: {

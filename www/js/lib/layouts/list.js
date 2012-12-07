@@ -121,6 +121,9 @@ define(function(require) {
             },
             collection: function(col) {
                 this.view.collection = col;
+            },
+            onOpen: function(func) {
+                this.view.onOpen = func;
             }
         },
         methods: {
