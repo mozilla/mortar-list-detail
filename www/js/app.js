@@ -23,8 +23,10 @@ define(function(require) {
     // List view
 
     var list = $('.list').get(0);
-    list.add({ title: 'Cook yummy food',
-               desc: 'COOK ALL THE THINGS',
+    list.add({ title: 'Learn this template',
+               desc: 'This is a list-detail template. Learn more ' +
+                     'about it at its ' +
+                     '<a href="https://github.com/mozilla/mortar-list-detail">project page!</a>',
                date: new Date() });
     list.add({ title: 'Make things',
                desc: 'Make this look like that',
@@ -45,8 +47,8 @@ define(function(require) {
 
     var detail = $('.detail').get(0);
     detail.render = function(item) {
-        $('.title', this).text(item.get('title'));
-        $('.desc', this).text(item.get('desc'));
+        $('.title', this).html(item.get('title'));
+        $('.desc', this).html(item.get('desc'));
         $('.date', this).text(formatDate(item.get('date')));
     };
 

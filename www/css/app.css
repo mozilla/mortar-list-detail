@@ -2,8 +2,8 @@
 /* Tip: Use "@import" to add styles instead of adding <link>'s in your
    HTML, and volo will inline it when building for production */
 
-/* @import "install-button.css"; */
-/* @import "layouts.css"; */
+@import "install-button.css";
+@import "../js/lib/layouts/css/layouts.css";
 
 @import "fonts.css";
 
@@ -21,12 +21,12 @@ h1 {
     font: 2.2rem/4.8rem "Open Sans", Sans-serif;
 }
 
-x-view.detail .contents, x-view.edit .contents {
+x-view .contents {
     padding: 1em;
 }
 
-x-view.detail .contents h1 {
-    margin: 0;
+x-view h1 {
+    margin-top: 0;
 }
 
 x-view.edit .field {

@@ -86,7 +86,6 @@ x-listview > header .navitems.left button {
 x-view > header h1,
 x-listview > header h1 {
   margin: 0;
-  margin-top: 4pt;
   padding: 0;
   font-size: 2em;
   line-height: 40pt;
@@ -98,6 +97,6 @@ x-listview > ._contents {
   overflow-x: hidden;
   overflow-y: auto;
 }
-x-listview .contents {
+x-listview > ._contents > .contents {
   padding: 0;
 }
