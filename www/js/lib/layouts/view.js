@@ -1,5 +1,7 @@
 
 define(function(require) {
+    var xtag = require('x-tag');
+
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');

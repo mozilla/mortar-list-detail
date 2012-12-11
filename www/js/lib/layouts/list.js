@@ -1,6 +1,6 @@
 
 define(function(require) {
-    require('layouts/app');
+    var xtag = require('x-tag');
 
     var $ = require('zepto');
     var _ = require('underscore');
