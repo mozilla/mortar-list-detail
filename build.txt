@@ -1,6 +1,8 @@
 
 css/app.css
 ----------------
+css/install-button.css
+css/../js/lib/layouts/css/layouts.css
 css/fonts.css
 css/app.css
 
@@ -12,9 +14,9 @@ css/install-button.css
 ----------------
 css/install-button.css
 
-css/layouts.css
+js/lib/layouts/css/layouts.css
 ----------------
-css/layouts.css
+js/lib/layouts/css/layouts.css
 
 js/lib/../app.js
 ----------------
@@ -22,12 +24,14 @@ js/lib/receiptverifier.js
 js/lib/install.js
 js/lib/../install-button.js
 js/lib/zepto.js
+js/lib/x-tag.js
 js/lib/underscore.js
 js/lib/backbone.js
+js/lib/layouts/css-animations.js
 js/lib/layouts/anim.js
 js/lib/layouts/header.js
 js/lib/layouts/footer.js
 js/lib/layouts/view.js
-js/lib/layouts/app.js
 js/lib/layouts/list.js
+js/lib/layouts/layouts.js
 js/lib/../app.js
