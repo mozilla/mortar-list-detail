@@ -1,7 +1,5 @@
 
 define(function(require) {
-    var xtag = require('x-tag');
-
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
@@ -9,26 +7,46 @@ define(function(require) {
     var Header = require('./header');
     var Footer = require('./footer');
 
-    var globalObject = {
-        _stack: [],
-        stackSize: function() {
-            return globalObject._stack.length;
-        },
-        clearStack: function() {
-            var stack = globalObject._stack;
+    function FakeView() {
+        this._stack = [];
+        this.manualLayout = true;
+
+        this.stackSize = function() {
+            return this._stack.length;
+        };
+
+        this.clearStack = function() {
+            var stack = this._stack;
 
             while(stack.length) {
                 stack[stack.length - 1].close();
             }
-        }
-    };
+        };
+    }
 
     var BasicView = Backbone.View.extend({
         initialize: function() {
+            // `initView` is a separate function so anything that
+            // extends `BasicView` and overrides `initialize` can still
+            // call it
+            this.initView();
+        },
+
+        initView: function() {
+            var el = $(this.el);
+
             this._stack = [];
-            
-            var p = $(this.el).parents('x-view').get(0);
-            this.parent = p ? p.view : globalObject;
+            this.manualLayout = el.data('layout') == 'manual';
+            this.anim = el.data('animation');
+
+            var p = el.parent().get(0);
+            if(p.view || p.proxyView) {
+                this.parent = p.view || p.proxyView;
+            }
+            else {
+                p.view = this.parent = new FakeView();
+            }
+
             this.initMarkup();
         },
 
@@ -50,12 +68,26 @@ define(function(require) {
             var nodes = Array.prototype.slice.call(el[0].childNodes);
             var contents = $(nodes);
 
-            if(!contents.length) {
-                el.append('<div class="_contents"><div class="contents"></div></div>');
+            if(this.manualLayout) {
+                if(!contents.length) {
+                    el.append('<div class="_contents"></div>');
+                }
+                else {
+                    contents.wrapAll('<div class="_contents"></div>');
+                }
+
+                el.children('._contents').get(0).proxyView = this;
             }
             else {
-                contents.wrapAll('<div class="contents"></div>');
-                el.children('.contents').wrap('<div class="_contents"></div>');
+                if(!contents.length) {
+                    el.append('<div class="_contents"><div class="contents"></div></div>');    
+                }
+                else {
+                    contents.wrapAll('<div class="contents"></div>');
+                    el.children('.contents').wrap('<div class="_contents"></div>');
+                }
+
+                el.children('._contents').children('.contents').get(0).proxyView = this;
             }
 
             if(this.header) {
@@ -68,33 +100,44 @@ define(function(require) {
 
             // Position the view (not done in css because we don't
             // want a "pop" when the page loads)
-            el.css({
-                position: 'absolute',
-                top: 0,
-                left: 0
-            });
+            // el.css({
+            //     position: 'absolute',
+            //     top: 0,
+            //     left: 0
+            // });
             this.onResize();
         },
 
         onResize: function() {
             var el = $(this.el);
+            //var parentEl;
 
-            // The parent element is the closest ._contents if exists,
-            // otherwise the immediate parent
-            var appEl = el.parents('._contents').first();            
-            if(!appEl.length) {
-                appEl = el.parent();
-            }
+            // The structure of a view is `x-view > ._contents >
+            // .contents`. The extra markup lets users put padding on
+            // the .contents element reliably. Because of this, if
+            // views are inside views, we really want the dimension of
+            // the parent ._contents. However, if we are not inside a
+            // view, it should just use the immediate parent.
 
-            var appHeight = appEl.height();
+            // if(el.parent().is('.contents') &&
+            //    el.parent().parent().is('._contents') &&
+            //    el.parent().parents().parent().is('x-view')) {
+            //     parentEl = el.parent().parent();
+            // }
+            // else {
+            //     parentEl = null;
+            // }
 
-            // Width
-            el.width(appEl.width());
+            var barHeights = (el.children('header').height() +
+                              el.children('footer').height());
 
-            // Height (minus the header and footer)
-            var height = (el.children('header').height() +
-                          el.children('footer').height());
-            el.children('._contents').css({ height: appHeight - height });
+            // if(parentEl) {
+            //     el.width(parentEl.width());
+            //     el.children('._contents').css({ height: parentEl.height() - barHeights });
+            // }
+            // else {
+                el.children('._contents').css({ height: el.height() - barHeights });
+        //}
 
             if(this.header) {
                 this.header.setTitle(this.header.getTitle());
@@ -123,7 +166,7 @@ define(function(require) {
             var text;
 
             if(this.getTitle) {
-                text = this.getTitle();
+                text = this.getTitle(model);
             }
             else if(model && model.get(titleField)) {
                 text = model.get(titleField);
@@ -141,7 +184,9 @@ define(function(require) {
             // Open a view and push it on the parent view's navigation
             // stack
 
-            anim = anim || 'instant';
+            anim = anim || this.anim || 'slideLeft';
+            this.lastAnimation = anim;
+
             var stack = this.parent._stack;
 
             if(stack.indexOf(this.el) !== -1) {
@@ -150,7 +195,14 @@ define(function(require) {
             }
 
             if(anims[anim]) {
-                anims[anim](this.el);
+                var len = stack.length;
+                var srcNode = null;
+
+                if(len) {
+                    srcNode = stack[len - 1];
+                }
+
+                anims[anim](srcNode, this.el);
             }
             else {
                 console.log('WARNING: invalid animation: ' + anim);
@@ -188,7 +240,7 @@ define(function(require) {
             anim = anim || 'instant';
 
             if(anims[anim]) {
-                anims[anim](this.el);
+                anims[anim](null, this.el);
             }
             else {
                 console.log('WARNING: invalid animation: ' + anim);
@@ -208,89 +260,39 @@ define(function(require) {
         },
 
         close: function(anim) {
-            anim = anim || 'instantOut';
-            var stack = this.parent._stack;
-            var lastIdx = stack.length - 1;
-
-            if(stack[lastIdx] == this.el) {
-                stack.pop();
+            if(!anim) {
+                switch(this.lastAnimation) {
+                case 'slideLeft': anim = 'slideRightOut'; break;
+                case 'slideRight': anim = 'slideLeftOut'; break;
+                case 'slideUp': anim = 'slideDownOut'; break;
+                case 'slideDown': anim = 'slideUpOut'; break;
+                default:
+                    anim = 'slideRightOut';
+                }
             }
-            
-            anims[anim](this.el);
-            this.model = null;
+
+            var stack = this.parent._stack;
+            var len = stack.length;
+
+            // Only close views that aren't at the bottom
+            if(len > 1) {
+                if(stack[len - 1] == this.el) {
+                    stack.pop();
+                }
+
+                anims[anim](stack[len - 2], this.el);
+                this.model = null;
+            }
         },
-        
+
         render: function() {
             var model = this.model;
 
             if(this.options.render) {
                 this.options.render.call(this.el, model);
             }
-            else {
-                console.log('[BasicView] WARNING: No render function ' +
-                            'available. Set one on the "render" property ' +
-                            'of the x-view.');
-            }
         }
     });
-
-    xtag.register('x-view', {
-        onCreate: function() {
-            var view = this.view = new BasicView({ el: this });
-            
-            if(this.dataset.first == 'true') {
-                view.parent.clearStack();
-                view.open();
-            }
-            else if(!view.parent.stackSize()) {
-                view.open();
-            }
-        },
-        getters: {
-            model: function() {
-                return this.view.model;
-            }
-        },
-        setters: {
-            titleField: function(name) {
-                this.view.options.titleField = name;
-            },
-            render: function(func) {
-                this.view.options.render = func;
-            },
-            getTitle: function(func) {
-                this.view.getTitle = function() {
-                    // It should be called with "this" as the element,
-                    // not the view, since that's what it looks like
-                    // from the user perspective
-                    return func.call(this.el);
-                };
-            },
-            model: function(model) {
-                this.view.model = model;
-            },
-            onOpen: function(func) {
-                this.view.onOpen = func;
-            }
-        },
-        methods: {
-            open: function(model, anim) {
-                this.view.open(model, anim);
-            },
-            close: function(anim) {
-                this.view.close(anim);
-            }
-        }
-    });
-
-    window.onresize = function() {
-        var els = 'x-view, x-listview';
-        $(els).each(function() {
-            this.view.onResize();
-        });
-    };
-
-    BasicView.globalObject = globalObject;
 
     return BasicView;
 });

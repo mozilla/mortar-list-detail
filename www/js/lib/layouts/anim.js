@@ -1,12 +1,14 @@
 
 define(function(require) {
     var $ = require('zepto');
+    var animations = require('./css-animations');
 
     var zindex = 100;
 
     // Utility
 
     function vendorized(prop, val, obj) {
+        obj = obj || {};
         obj['-webkit-' + prop] = val;
         obj['-moz-' + prop] = val;
         obj['-ms-' + prop] = val;
@@ -15,8 +17,10 @@ define(function(require) {
         return obj;
     }
 
-    function onOnce(node, event, func) {
+    function addSingleEvent(node, event, func) {
+        node = $(node);
         var props = ['', 'webkit', 'moz', 'ms', 'o'];
+
         for(var k in props) {
             (function(prefix) {
                 node.on(prefix + event, function() {
@@ -28,68 +32,129 @@ define(function(require) {
     }
 
     function animateX(node, start, end, duration, bury) {
-        animate(node, start, end, 'left', duration, bury);
+        animate(node,
+                vendorized('transform', 'translateX(' + Math.floor(start) + 'px)'),
+                vendorized('transform', 'translateX(' + Math.floor(end) + 'px)'),
+                duration,
+                bury);
     }
 
-    function animate(node, start, end, property, duration, bury) {
+    function animateY(node, start, end, duration, bury) {
+        animate(node,
+                vendorized('transform', 'translateY(' + Math.floor(start) + 'px)'),
+                vendorized('transform', 'translateY(' + Math.floor(end) + 'px)'),
+                duration,
+                bury);
+    }
+
+    function animate(node, start, end, duration, bury) {
         node = $(node);
+        var anim = animations.create();
 
-        node.css(vendorized('transitionDuration', 0, {
-            left: start
-        }));
+        anim.setKeyframe('0%', start);
+        anim.setKeyframe('100%', end);
 
-        // Triggers a layout which forces the above style to be
-        // applied before the transition starts
-        var forced = node[0].offsetLeft;
+        node.css(
+            vendorized('animation-duration', duration,
+                vendorized('animation-name', anim.name, {
+                    'z-index': zindex++
+                })
+            )
+        );
 
-        var styles = {
-            left: end,
-            zIndex: zindex++
-        };
+        addSingleEvent(node, 'animationend', function() {
+            if(bury) {
+                node.css({ zIndex: 0 });
+            }
 
-        styles = vendorized('transitionDuration', duration, styles);
-        styles = vendorized('transitionProperty', property, styles);
-        styles = vendorized('transitionTimingFunction', 'ease-in-out', styles);
-        node.css(styles);
-
-        if(bury) {
-            onOnce(node, 'transitionend', function() {
-                // Bury the element in case the window is resized
-                // larger
-                node.css({ zIndex: 100 });
-            });
-        }
+            animations.remove(anim);         
+        });
     }
 
     // Animations
 
-    function instant(node) {
-        node = $(node);
-        node.css(vendorized('transition', 'none', {
-            left: 0,
+    function instant(srcNode, destNode) {
+        $(destNode).css(vendorized('transition', 'none', {
             zIndex: zindex++
         }));
     }
 
-    function instantOut(node) {
-        node = $(node);
-        node.css(vendorized('transition', 'none', {
-            left: node.width()
+    function instantOut(srcNode, destNode) {
+        $(destNode).css(vendorized('transition', 'none', {
+            zIndex: 0
         }));
     }
 
-    function slideLeft(node) {
-        animateX(node, $(node).width(), 0, '300ms');
+    function slideLeft(srcNode, destNode) {
+        animateX(srcNode, 0, -$(srcNode).width(), '500ms');
+        animateX(destNode, $(destNode).width(), 0, '500ms');
     }
 
-    function slideRightOut(node) {
-        animateX(node, 0, $(node).width(), '300ms', true);
+    function slideLeftOut(srcNode, destNode) {
+        slideLeft(destNode, srcNode);
+    }
+
+    function slideRight(srcNode, destNode) {
+        animateX(srcNode, 0, $(srcNode).width(), '500ms');
+        animateX(destNode, -$(destNode).width(), 0, '500ms');
+    }
+
+    function slideRightOut(srcNode, destNode) {
+        slideRight(destNode, srcNode);
+    }
+
+    function slideDown(srcNode, destNode) {
+        animateY(destNode, -$(destNode).height(), 0, '500ms');
+    }
+
+    function slideDownOut(srcNode, destNode) {
+        animateY(destNode, 0, $(destNode).height(), '500ms', true);
+    }
+
+    function slideUp(srcNode, destNode) {
+        animateY(destNode, $(destNode).height(), 0, '500ms');
+    }
+
+    function slideUpOut(srcNode, destNode) {
+        animateY(destNode, 0, -$(destNode).height(), '500ms', true);
+    }
+
+    function flip(srcNode, destNode) {
+        var bg = $('<div class="anim-background"></div>');
+        bg.css({ zIndex: zindex++ });
+        bg.insertBefore(destNode);
+
+        animate(srcNode,
+                vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
+                vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
+                '1s');
+
+        animate(destNode,
+                vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
+                vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
+                '1s');
+
+        addSingleEvent(destNode, 'animationend', function() {
+            bg.remove();            
+        });
+    }
+
+    function flipOut(srcNode, destNode) {
+        flip(destNode, srcNode);
     }
 
     return {
         instant: instant,
         instantOut: instantOut,
         slideLeft: slideLeft,
-        slideRightOut: slideRightOut
+        slideLeftOut: slideLeftOut,
+        slideRight: slideRight,
+        slideRightOut: slideRightOut,
+        slideDown: slideDown,
+        slideDownOut: slideDownOut,
+        slideUp: slideUp,
+        slideUpOut: slideUpOut,
+        flip: flip,
+        flipOut: flipOut
     };
 });

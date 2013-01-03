@@ -9,10 +9,11 @@ define(function(require) {
     // Installation button
     require('./install-button');
 
+    // Install the layouts
+    require('layouts/layouts');
+
     // Write your app here.
 
-    require('layouts/view');
-    require('layouts/list');
 
     function formatDate(d) {
         return (d.getMonth()+1) + '/' +
@@ -37,10 +38,6 @@ define(function(require) {
 
     $('button.refresh', list).click(function() {
         // Do nothing right now
-    });
-
-    $('button.add', list).click(function() {
-        edit.open(null, 'slideLeft');
     });
     
     // Detail view
@@ -89,6 +86,6 @@ define(function(require) {
                        date: new Date() });
         }
 
-        edit.close('slideRightOut');
+        edit.close();
     });
 });

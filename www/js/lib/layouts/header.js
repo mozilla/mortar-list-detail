@@ -42,9 +42,11 @@ define(function(require) {
         }
 
         el.find('button').click(function() {
-            if(this.dataset.view) {
-                var view = $(this.dataset.view).get(0);
-                view.open(parent.model, 'slideLeft');
+            var btn = $(this);
+
+            if(btn.data('view')) {
+                var view = $(btn.data('view')).get(0);
+                view.open(parent.model, btn.data('animation'));
             }
         });
 
@@ -61,13 +63,13 @@ define(function(require) {
             nav.append(back);
 
             back.click(function() {
-                _this.parent.close('slideRightOut');
+                _this.parent.close();
             });
         }
     };
 
     Header.prototype.removeBack = function() {
-        $('.navitems.left button.back').remove();
+        $('.navitems.left button.back', this.el).remove();
     };
 
     Header.prototype.setTitle = function(text) {
