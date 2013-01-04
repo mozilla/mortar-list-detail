@@ -1,5 +1,5 @@
 
-# A List/Detail Template for Open Web Apps
+# A List/Detail Template for Open Web Apps (beta)
 
 This template comes with a new layouts library that lets you create apps quickly, and initial HTML and javascript that defines a list/detail application.
 
