@@ -78,7 +78,7 @@ define(function(require) {
         },
         setters: {
             titleField: function(name) {
-                this.view.opts.titleField = name;
+                this.view.options.titleField = name;
             },
             renderRow: function(func) {
                 this.view.options.renderRow = func;
