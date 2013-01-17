@@ -3,6 +3,7 @@ define(function(require) {
     var $ = require('zepto');
     var _ = require('underscore');
     var Backbone = require('backbone');
+    var anims = require('./anim');
     var BasicView = require('./view');
 
     var Item = Backbone.Model.extend({});
@@ -17,19 +18,14 @@ define(function(require) {
             this.collection.bind('add', _.bind(this.appendItem, this));
             this.collection.bind('reset', _.bind(this.render, this));
 
-            // TODO: clean this up
             // We unhighlight things at animation end because it's
             // better visually to keep things highlighted during the
             // when the view is going away
-            var props = ['', 'webkit', 'moz', 'ms', 'o'];
             var el = this.el;
-            for(var k in props) {
-                (function(prefix) {
-                    $(el).on(prefix + 'animationend', function() {
-                        $('ul._list > li', el).removeClass('highlighted');
-                    });
-                })(props[k]);
-            }
+            anims.onAnimationEnd(el, function() {
+                console.log('unhighlighting');
+                $('ul._list > li', el).removeClass('highlighted');
+            });
 
             $('.contents', this.el).append('<ul class="_list"></ul>');
             this.render();

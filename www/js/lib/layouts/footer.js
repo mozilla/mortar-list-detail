@@ -2,6 +2,10 @@
 define(function(require) {
     var $ = require('zepto');
 
+    var clickEvent = ('ontouchstart' in document.documentElement ?
+                      'touchstart' :
+                      'click');
+
     function Footer(parent) {
         this.parent = parent;
 
@@ -16,7 +20,7 @@ define(function(require) {
             // the value when pressed
             var view = btn.data('view');
             if(view) {
-                btn.click(function() {
+                btn.on(clickEvent, function() {
                     _this.openView(view,
                                    btn.data('push') == 'true',
                                    btn.data('animation'));

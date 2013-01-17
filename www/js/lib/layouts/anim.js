@@ -17,20 +17,26 @@ define(function(require) {
         return obj;
     }
 
-    function addSingleEvent(node, event, func) {
+    function onAnimationEnd(node, func) {
         node = $(node);
-        var props = ['', 'webkit', 'moz', 'ms', 'o'];
+        var props = ['animationend', 
+                     'webkitAnimationEnd', 
+                     'mozanimationend',
+                     'MSAnimationEnd',
+                     'oanimationend'];
 
+        for(var k in props) {
+            node.on(props[k], func);
+        }
+    }
+
+    function onAnimationEndOnce(node, func) {
         function callback() {
             func();
             node.off(null, callback);
         }
 
-        for(var k in props) {
-            (function(prefix) {
-                node.on(prefix + event, callback);
-            })(props[k]);
-        }
+        onAnimationEnd(node, callback);
     }
 
     function animateX(node, start, end, duration, bury) {
@@ -64,12 +70,13 @@ define(function(require) {
             )
         );
 
-        addSingleEvent(node, 'animationend', function() {
+        onAnimationEndOnce(node, function() {
             if(bury) {
                 node.css({ zIndex: 0 });
             }
-            
-            animations.remove(anim);         
+
+            animations.remove(anim);
+            console.log('ending');
         });
     }
 
@@ -156,8 +163,8 @@ define(function(require) {
                     '1s');
         }, 0);
 
-        addSingleEvent(destNode, 'animationend', function() {
-            bg.remove();            
+        onAnimationEndOnce(destNode, function() {
+            bg.remove();
         });
     }
 
@@ -177,6 +184,9 @@ define(function(require) {
         slideUp: slideUp,
         slideUpOut: slideUpOut,
         flip: flip,
-        flipOut: flipOut
+        flipOut: flipOut,
+
+        onAnimationEnd: onAnimationEnd,
+        onAnimationEndOnce: onAnimationEndOnce
     };
 });
