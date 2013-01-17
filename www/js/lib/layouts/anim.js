@@ -21,12 +21,14 @@ define(function(require) {
         node = $(node);
         var props = ['', 'webkit', 'moz', 'ms', 'o'];
 
+        function callback() {
+            func();
+            node.off(null, callback);
+        }
+
         for(var k in props) {
             (function(prefix) {
-                node.on(prefix + event, function() {
-                    func();
-                    node.off(prefix + event);
-                });
+                node.on(prefix + event, callback);
             })(props[k]);
         }
     }
@@ -66,7 +68,7 @@ define(function(require) {
             if(bury) {
                 node.css({ zIndex: 0 });
             }
-
+            
             animations.remove(anim);         
         });
     }
@@ -86,8 +88,13 @@ define(function(require) {
     }
 
     function slideLeft(srcNode, destNode) {
-        animateX(srcNode, 0, -$(srcNode).width(), '500ms');
-        animateX(destNode, $(destNode).width(), 0, '500ms');
+        var srcW = $(srcNode).width();
+        var destW = $(destNode).width();
+
+        setTimeout(function() {
+            animateX(srcNode, 0, -srcW, '500ms');
+            animateX(destNode, destW, 0, '500ms');
+        }, 0);
     }
 
     function slideLeftOut(srcNode, destNode) {
@@ -95,8 +102,13 @@ define(function(require) {
     }
 
     function slideRight(srcNode, destNode) {
-        animateX(srcNode, 0, $(srcNode).width(), '500ms');
-        animateX(destNode, -$(destNode).width(), 0, '500ms');
+        var srcW = $(srcNode).width();
+        var destW = $(destNode).width();
+
+        setTimeout(function() {
+            animateX(srcNode, 0, srcW, '500ms');
+            animateX(destNode, -destW, 0, '500ms');
+        }, 0);
     }
 
     function slideRightOut(srcNode, destNode) {
@@ -104,19 +116,27 @@ define(function(require) {
     }
 
     function slideDown(srcNode, destNode) {
-        animateY(destNode, -$(destNode).height(), 0, '500ms');
+        setTimeout(function() {
+            animateY(destNode, -$(destNode).height(), 0, '500ms');
+        }, 0);
     }
 
     function slideDownOut(srcNode, destNode) {
-        animateY(destNode, 0, $(destNode).height(), '500ms', true);
+        setTimeout(function() {
+            animateY(destNode, 0, $(destNode).height(), '500ms', true);
+        }, 0);
     }
 
     function slideUp(srcNode, destNode) {
-        animateY(destNode, $(destNode).height(), 0, '500ms');
+        setTimeout(function() {
+            animateY(destNode, $(destNode).height(), 0, '500ms');
+        }, 0);
     }
 
     function slideUpOut(srcNode, destNode) {
-        animateY(destNode, 0, -$(destNode).height(), '500ms', true);
+        setTimeout(function() {
+            animateY(destNode, 0, -$(destNode).height(), '500ms', true);
+        }, 0);
     }
 
     function flip(srcNode, destNode) {
@@ -124,15 +144,17 @@ define(function(require) {
         bg.css({ zIndex: zindex++ });
         bg.insertBefore(destNode);
 
-        animate(srcNode,
-                vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
-                vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
-                '1s');
+        setTimeout(function() {
+            animate(srcNode,
+                    vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
+                    vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
+                    '1s');
 
-        animate(destNode,
-                vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
-                vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
-                '1s');
+            animate(destNode,
+                    vendorized('transform', 'rotate3d(0, 1, 0, 180deg)'),
+                    vendorized('transform', 'rotate3d(0, 1, 0, 0deg)'),
+                    '1s');
+        }, 0);
 
         addSingleEvent(destNode, 'animationend', function() {
             bg.remove();            

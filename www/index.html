@@ -6,6 +6,8 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <!-- Place favicon.ico in the root directory -->
 
@@ -16,41 +18,37 @@
          through the marketpace (see app.js) -->
     <!-- <button id="install-btn">Install</button>     -->
 
-    <div class="loading">Loading...</div>
-    
-    <x-view id="app">
-      <x-listview class="list">
-        <header>
-          <button class="refresh">Refresh</button>
-          <h1>My Items</h1>
-          <button class="add" data-view=".edit" data-animation="slideDown">+</button>
-        </header>
-      </x-listview>
+    <x-listview class="list">
+      <header>
+        <h1>My Items</h1>
+        <button class="add" data-view=".edit" data-animation="slideDown">+</button>
+      </header>
+    </x-listview>
 
-      <x-view class="detail">
-        <header>
-          <h1>Details</h1>
-          <button data-view="x-view.edit">Edit</button>
-        </header>
-        
-        <h1 class="title"></h1>
-        <p class="desc"></p>
-        <p class="date"></p>
-      </x-view>
+    <x-view class="detail">
+      <header>
+        <h1>Details</h1>
+        <button data-view="x-view.edit">Edit</button>
+      </header>
 
-      <x-view class="edit">
-        <header><h1>Edit</h1></header>
-        <div class="field">Title: <input type="text" name="title" /></div>
-        <div class="field">Description: <input type="text" name="desc" /></div>
-        <button type="submit" class="add">Add</button>
-      </x-view>
+      <h1 class="title"></h1>
+      <p class="desc"></p>
+      <p class="date"></p>
     </x-view>
+
+    <x-view class="edit">
+      <header><h1>Edit</h1></header>
+      <div class="field">Title: <input type="text" name="title" /></div>
+      <div class="field">Description: <input type="text" name="desc" /></div>
+      <button type="submit" class="add">Add</button>
+    </x-view>
+
+    <div class="loading">Loading...</div>
 
     <!-- Using require.js, a module system for javascript, include the
          js files. This loads "main.js", which in turn can load other
          files, all handled by require.js:
          http://requirejs.org/docs/api.html#jsfiles -->
-    <script type="text/javascript" src="js/x-tag.js"></script>
     <script type="text/javascript"
             data-main="js/init.js"
             src="js/lib/require.js"></script>

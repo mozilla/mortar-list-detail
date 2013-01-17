@@ -17,6 +17,20 @@ define(function(require) {
             this.collection.bind('add', _.bind(this.appendItem, this));
             this.collection.bind('reset', _.bind(this.render, this));
 
+            // TODO: clean this up
+            // We unhighlight things at animation end because it's
+            // better visually to keep things highlighted during the
+            // when the view is going away
+            var props = ['', 'webkit', 'moz', 'ms', 'o'];
+            var el = this.el;
+            for(var k in props) {
+                (function(prefix) {
+                    $(el).on(prefix + 'animationend', function() {
+                        $('ul._list > li', el).removeClass('highlighted');
+                    });
+                })(props[k]);
+            }
+
             $('.contents', this.el).append('<ul class="_list"></ul>');
             this.render();
         },
@@ -42,12 +56,69 @@ define(function(require) {
     var ListViewRow = Backbone.View.extend({
         tagName: 'li',
 
-        events: {
-            'click': 'open'
+        events: function() {
+            if('ontouchstart' in document.documentElement) {
+                 return { 'touchstart': 'touchMouseStart',
+                          'touchmove': 'touchMove',
+                          'touchend': 'touchMouseEnd'};
+            }
+            else {
+                return { 'mousedown': 'touchMouseStart',
+                         'mouseleave': 'mouseLeave',
+                         'mouseup': 'touchMouseEnd'};
+            }
         },
 
         initialize: function() {
             this.model.on('change', _.bind(this.render, this));
+        },
+
+        touchMouseStart: function(e) {
+            // TODO: generalize this
+            var touch = e.changedTouches ? e.changedTouches[0] : e;
+            this.touchPos = [touch.pageX, touch.pageY];
+
+            var _this = this;
+            this.highlightTimer = setTimeout(function() {
+                $(_this.el).addClass('highlighted');
+                _this.highlightTimer = null;
+            }, 120);
+        },
+
+        mouseLeave: function(e) {
+            // Only called when there is a mouse
+            // involved, needed because 'mousemove' is not always
+            // called on the same element like 'touchmove' is
+
+            $(this.el).removeClass('highlighted');
+            this.touchPos = null;
+        },
+
+        touchMove: function(e) {
+            // Only called for touches, need to differentiate drags
+            // and taps
+
+            var touch = e.changedTouches ? e.changedTouches[0] : e;
+            var dx = this.touchPos[0] - touch.pageX;
+            var dy = this.touchPos[1] - touch.pageY;
+
+            // If it travels too far outside the original point,
+            // it's a drag
+            if(dx >= 10 || dx <= -10 || dy >= 10 || dy <= -10) {
+                if(this.highlightTimer) {
+                    clearTimeout(this.highlightTimer);
+                }
+
+                $(this.el).removeClass('highlighted');
+                this.touchPos = null;
+            }
+        },
+
+        touchMouseEnd: function(e) {
+            if(this.touchPos) {
+                $(this.el).addClass('highlighted');
+                this.open();
+            }
         },
 
         render: function() {

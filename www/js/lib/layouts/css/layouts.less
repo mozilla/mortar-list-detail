@@ -3,7 +3,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 
 .loading {
@@ -51,7 +51,7 @@ x-view, x-listview {
     height: 100%;
     width: 100%;
 
-    animation-timing-function: ease-out;
+    /* animation-timing-function: ease-out; */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     -moz-backface-visibility: hidden;
@@ -127,6 +127,12 @@ x-view, x-listview {
 
 x-listview > ._contents > .contents {
     padding: 0;
+}
+
+._list li {
+    &.highlighted {
+        background-color: #99bbdd;
+    }
 }
 
 @keyframes slideIn {

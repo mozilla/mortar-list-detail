@@ -32,14 +32,12 @@ define(function(require) {
     list.add({ title: 'Make things',
                desc: 'Make this look like that',
                date: new Date(12, 9, 5) });
-    list.add({ title: 'Move stuff',
-               desc: 'Move this over there',
-               date: new Date(12, 10, 1) });
+    for(var i=0; i<8; i++) {
+        list.add({ title: 'Move stuff',
+                   desc: 'Move this over there',
+                   date: new Date(12, 10, 1) });
+    }
 
-    $('button.refresh', list).click(function() {
-        // Do nothing right now
-    });
-    
     // Detail view
 
     var detail = $('.detail').get(0);

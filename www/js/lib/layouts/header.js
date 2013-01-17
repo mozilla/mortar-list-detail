@@ -2,6 +2,10 @@
 define(function(require) {
     var $ = require('zepto');
 
+    var clickEvent = ('ontouchstart' in document.documentElement ?
+                      'touchstart' :
+                      'click');
+
     function Header(parent) {
         this.parent = parent;
 
@@ -41,7 +45,7 @@ define(function(require) {
             el.append(rightWrapper);
         }
 
-        el.find('button').click(function() {
+        el.find('button').on(clickEvent, function() {
             var btn = $(this);
 
             if(btn.data('view')) {
@@ -62,7 +66,7 @@ define(function(require) {
             var back = $('<button class="back">Back</button>');
             nav.append(back);
 
-            back.click(function() {
+            back.on(clickEvent, function() {
                 _this.parent.close();
             });
         }
