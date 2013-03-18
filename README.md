@@ -1,6 +1,8 @@
 
 # A List/Detail Template for Open Web Apps (beta)
 
+**Warning**: the contents in this tempate are deprected, and will soon be replaced by a much different structure. Volo and several other things will be removed to offer a simpler and more extensible template.
+
 This template comes with a new layouts library that lets you create apps quickly, and initial HTML and javascript that defines a list/detail application.
 
 It is part of the [mortar](https://github.com/mozilla/mortar/)
